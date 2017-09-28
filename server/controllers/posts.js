@@ -5,6 +5,7 @@ async function list(req, res) {
     const posts = await Post.all();
     res.status(200).send(posts);
   }
+  // TODO: Don't actually send the error
   catch(error) {
     res.status(400).send(error);
   }
@@ -27,6 +28,7 @@ async function create(req, res) {
     });
     res.status(201).send(post);
   }
+  // TODO: Don't actually send the error
   catch(error) {
     res.status(400).send(error);
   }
