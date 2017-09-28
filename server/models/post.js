@@ -1,6 +1,6 @@
 'use strict';
 module.exports = (sequelize, DataTypes) => {
-  var Posting = sequelize.define('Posting', {
+  const Post = sequelize.define('Post', {
     title: DataTypes.STRING,
     body: DataTypes.TEXT,
     price: DataTypes.INTEGER,
@@ -19,5 +19,5 @@ module.exports = (sequelize, DataTypes) => {
       }
     }
   });
-  return Posting;
+  return Post;
 };
