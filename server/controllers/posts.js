@@ -1,8 +1,18 @@
 const Post = require('../models').Post;
 
-module.exports = {
-  create(req, res) {
-    return Post.create({
+async function list(req, res) {
+  try {
+    const posts = await Post.all();
+    res.status(200).send(posts);
+  }
+  catch(error) {
+    res.status(400).send(error);
+  }
+};
+
+async function create(req, res) {
+  try {
+    const post = await Post.create({
       title: req.body.title,
       body: req.body.body,
       price: req.body.price,
@@ -14,14 +24,15 @@ module.exports = {
       housingType: req.body.housingType,
       url: req.body.url,
       craigslistPostId: req.body.craigslistPostId
-    })
-    .then(post => res.status(201).send(post))
-    .catch(error => res.status(400).send(error));
-  },
-
-  list(req, res) {
-    return Post.all()
-    .then(posts => res.status(200).send(posts))
-    .catch(error => res.status(400).send(error));
+    });
+    res.status(201).send(post);
   }
+  catch(error) {
+    res.status(400).send(error);
+  }
+};
+
+module.exports = {
+  create,
+  list
 };
