@@ -7,11 +7,11 @@ module.exports = (sequelize, DataTypes) => {
     address: DataTypes.STRING,
     bedrooms: DataTypes.INTEGER,
     bathrooms: DataTypes.INTEGER,
-    square_footage: DataTypes.INTEGER,
+    squareFootage: DataTypes.INTEGER,
     parking: DataTypes.STRING,
-    housingtype: DataTypes.STRING,
+    housingType: DataTypes.STRING,
     url: DataTypes.STRING,
-    craigslist_post_id: DataTypes.INTEGER
+    craigslistPostId: DataTypes.INTEGER
   }, {
     classMethods: {
       associate: (models) => {

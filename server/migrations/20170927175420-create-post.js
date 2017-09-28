@@ -26,19 +26,19 @@ module.exports = {
       bathrooms: {
         type: Sequelize.INTEGER
       },
-      square_footage: {
+      squareFootage: {
         type: Sequelize.INTEGER
       },
       parking: {
         type: Sequelize.STRING
       },
-      housingtype: {
+      housingType: {
         type: Sequelize.STRING
       },
       url: {
         type: Sequelize.STRING
       },
-      craigslist_post_id: {
+      craigslistPostId: {
         type: Sequelize.INTEGER
       },
       createdAt: {
