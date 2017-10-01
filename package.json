@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start:dev": "nodemon ./bin/www",
-    "start":"node ./bin/www",
+    "start": "node ./bin/www",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -13,16 +13,18 @@
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.18.2",
+    "dotenv": "^4.0.0",
     "express": "^4.15.5",
     "morgan": "^1.8.2",
     "pg": "^7.3.0",
     "pg-hstore": "^2.3.2",
-    "sequelize": "^4.11.0"
+    "sequelize": "^4.11.0",
+    "sequelize-cli": "^3.0.0"
   },
   "devDependencies": {
     "nodemon": "^1.12.1"
   },
   "engines": {
-    "node":"8.6.0"
+    "node": "8.6.0"
   }
 }
