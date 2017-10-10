@@ -1,9 +1,12 @@
-const Post = require('../models').Post;
+// const Post = require('../models').Post;
+let PostModel = require('../models/post');
+const knex = require('../../db/knex');
 
 async function list(req, res) {
   try {
-    const posts = await Post.all();
-    res.status(200).send(posts);
+    let posts = new PostModel();
+    const allPosts = await posts.fetchAll();
+    res.json(allPosts.toJSON());
   }
   // TODO: Don't actually send the error
   catch(error) {
@@ -13,9 +16,9 @@ async function list(req, res) {
 
 async function create(req, res) {
   try {
-    const post = await Post.create({
+    let post = new PostModel();
+    const insertedPost = await post.save({
       title: req.body.title,
-      body: req.body.body,
       price: req.body.price,
       address: req.body.address,
       bedrooms: req.body.bedrooms,
@@ -26,10 +29,13 @@ async function create(req, res) {
       url: req.body.url,
       craigslistPostId: req.body.craigslistPostId
     });
-    res.status(201).send(post);
+    console.log(insertedPost);
+    res.status(201).json(insertedPost.toJSON());
+    // res.json(post.toJSON());
   }
   // TODO: Don't actually send the error
   catch(error) {
+    console.log(error);
     res.status(400).send(error);
   }
 };
