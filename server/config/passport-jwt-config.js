@@ -12,7 +12,7 @@ module.exports = function() {
   opts.secretOrKey = securityConfig.jwtSecret;
   passport.use(new JwtStrategy(opts, (jwt_payload, done) => {
     // TODO: Cleanup?
-    User.where('id', jwt_payload.id).fetch({withRelated: 'roles'})
+    User.where('id', jwt_payload.id).fetch()
       .then(user => user ? done(null, user) : done(null, false))
       .catch(err => done(err, false));
   }));

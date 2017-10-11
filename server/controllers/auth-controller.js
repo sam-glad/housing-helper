@@ -1,44 +1,31 @@
 'use strict';
 
 const express = require('express');
+const router = express.Router();
 const jwt = require('jwt-simple');
 const User = require('../models/user');
 const authConfig = require('../config/auth-config');
+const Promise = require('bluebird');
 
-async function login(req, res) {
+router.post('/login', (req, res) => {
   const {username, password} = req.body;
-  try {
-    const user = await User.where('username', username).fetch();
-    if (user) {
-      const isValidPassword = await user.validPassword(password);
-      if (isValidPassword) {
-        const token = jwt.encode(user.omit('password'), authConfig.jwtSecret);
-        return res.json({success: true, token: `JWT ${token}`});
-      }
+  Promise.coroutine(function* () {
+    const user = yield User.where('username', username).fetch();
+    const isValidPassword = yield user.validPassword(password);
+    if (isValidPassword) {
+      const token = jwt.encode(user.omit('password'), authConfig.jwtSecret);
+      res.json({success: true, token: `JWT ${token}`});
+    } else {
+      res.json({success: false, msg: 'Authentication failed'});
     }
-    res.status(401).json({success: false, msg: 'Authentication failed'});
-  }
-  catch(error) {
-    // TODO: Something more permanent - Middleware?!
-    console.log(error);
-    res.status(500).json({ success: false, msg: 'Uh oh, something went wrong' });
-  }
-};
+  })().catch(err => console.log(err));
+});
 
-async function register(req, res) {
-  const { username, password } = req.body;
-  try {
-    const user = await User.forge({username, password}).save();
-    res.json(user.omit('password'));
-  }
-  catch(error) {
-    // TODO: Something more permanent - Middleware?!
-    console.log(error);
-    res.status(500).json({ success: false, msg: 'Uh oh, something went wrong' });
-  }
-};
+// TODO: catch sql errors
+router.post('/register', (req, res) => {
+    const {username, password} = req.body;
+    User.forge({username, password}).save()
+        .then(user => res.json(user.omit('password')));
+});
 
-module.exports = { 
-  login,
-  register
-};
+module.exports = router;

@@ -1,7 +1,10 @@
-let PostModel = require('../models/post');
-const knex = require('../../db/knex');
+const express = require('express');
+const router = express.Router();
 
-async function list(req, res) {
+let PostModel = require('../models/post');
+
+// TODO: catch sql errors
+router.post('/list', async (req, res) => {
   try {
     let posts = new PostModel();
     const allPosts = await posts.fetchAll();
@@ -11,9 +14,9 @@ async function list(req, res) {
   catch(error) {
     res.status(400).send(error);
   }
-};
+});
 
-async function create(req, res) {
+router.post('/', async (req, res) => {
   try {
     let post = new PostModel();
     const insertedPost = await post.save({
@@ -37,9 +40,6 @@ async function create(req, res) {
     console.log(error);
     res.status(400).send(error);
   }
-};
+});
 
-module.exports = {
-  create,
-  list
-};
+module.exports = router;
