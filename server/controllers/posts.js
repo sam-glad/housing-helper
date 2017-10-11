@@ -1,4 +1,3 @@
-// const Post = require('../models').Post;
 let PostModel = require('../models/post');
 const knex = require('../../db/knex');
 

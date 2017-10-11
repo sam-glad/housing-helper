@@ -1,5 +1,7 @@
 const posts = require('./posts');
+const auth = require('./auth-controller');
 
 module.exports = {
-  posts
+  posts,
+  auth
 };
