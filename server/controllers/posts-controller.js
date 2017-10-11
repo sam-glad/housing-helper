@@ -4,7 +4,7 @@ const router = express.Router();
 let PostModel = require('../models/post');
 
 // TODO: catch sql errors
-router.post('/list', async (req, res) => {
+router.get('/', async (req, res) => {
   try {
     let posts = new PostModel();
     const allPosts = await posts.fetchAll();

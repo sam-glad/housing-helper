@@ -23,9 +23,9 @@ router.post('/login', (req, res) => {
 
 // TODO: catch sql errors
 router.post('/register', (req, res) => {
-    const {username, password} = req.body;
-    User.forge({username, password}).save()
-        .then(user => res.json(user.omit('password')));
+  const {username, password} = req.body;
+  User.forge({username, password}).save()
+      .then(user => res.json(user.omit('password')));
 });
 
 module.exports = router;
