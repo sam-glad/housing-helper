@@ -4,7 +4,6 @@ const express = require('express');
 const router = express.Router();
 const passport = require('passport');
 
-
 const Post = require('../models/post');
 const User = require('../models/user');
 
@@ -17,7 +16,22 @@ router.get('/', passport.authenticate('jwt', { session: false }), async (req, re
   }
   // TODO: Don't actually send the error
   catch(error) {
-    res.status(400).send(error);
+    console.log(error)
+    res.status(400);
+  }
+});
+
+router.get('/:id', passport.authenticate('jwt', { session: false }), async (req, res) => {
+  try {
+    const post = await Post.where( 'id', req.params.id).fetch();
+    if (post.attributes.user_id === req.user.id) {
+      return res.status(200).json(post);
+    }
+    return res.status(401).send('Unauthorized');
+  }
+  catch(error) {
+    console.log(error);
+    return res.status(400);
   }
 });
 
@@ -45,7 +59,7 @@ router.post('/', passport.authenticate('jwt', { session: false }), async (req, r
   // TODO: Don't actually send the error
   catch(error) {
     console.log(error);
-    res.status(400).send(error);
+    res.status(400);
   }
 });
 
