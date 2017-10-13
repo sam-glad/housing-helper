@@ -4,6 +4,7 @@ const bookshelf = require('../../db/bookshelf');
 const Promise = require('bluebird');
 const bcrypt = Promise.promisifyAll(require('bcrypt'));
 const authConfig = require('../config/auth-config');
+require('./post');
 
 function initialize() {
   this.on('saving', model => {
@@ -21,8 +22,15 @@ function validPassword(password) {
   return bcrypt.compareAsync(password, this.attributes.password);
 }
 
-module.exports = bookshelf.Model.extend({
+function posts() {
+  return this.hasMany('Post');
+}
+
+const User = bookshelf.Model.extend({
   tableName: 'users',
   validPassword,
-  initialize
+  initialize,
+  posts
 });
+
+module.exports = bookshelf.model('User', User);
