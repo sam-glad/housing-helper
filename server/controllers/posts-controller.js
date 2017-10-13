@@ -1,14 +1,19 @@
+'use strict'
+
 const express = require('express');
 const router = express.Router();
+const passport = require('passport');
 
-let PostModel = require('../models/post');
+
+const Post = require('../models/post');
+const User = require('../models/user');
 
 // TODO: catch sql errors
-router.get('/', async (req, res) => {
+// Retrieve all posts added by authenticated user
+router.get('/', passport.authenticate('jwt', { session: false }), async (req, res) => {
   try {
-    let posts = new PostModel();
-    const allPosts = await posts.fetchAll();
-    res.json(allPosts.toJSON());
+    const posts = await Post.where('user_id', req.user.id).fetchAll();
+    res.json(posts);
   }
   // TODO: Don't actually send the error
   catch(error) {
@@ -16,9 +21,12 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.post('/', async (req, res) => {
+// TODO: Input validation?
+// Insert new post related to authenticated user
+router.post('/', passport.authenticate('jwt', { session: false }), async (req, res) => {
   try {
-    let post = new PostModel();
+    let post = new Post();
+
     const insertedPost = await post.save({
       title: req.body.title,
       price: req.body.price,
@@ -29,11 +37,10 @@ router.post('/', async (req, res) => {
       parking: req.body.parking,
       housingType: req.body.housingType,
       url: req.body.url,
-      craigslistPostId: req.body.craigslistPostId
+      craigslistPostId: req.body.craigslistPostId,
+      user_id: req.user.id
     });
-    console.log(insertedPost);
     res.status(201).json(insertedPost.toJSON());
-    // res.json(post.toJSON());
   }
   // TODO: Don't actually send the error
   catch(error) {
