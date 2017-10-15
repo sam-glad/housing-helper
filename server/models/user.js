@@ -5,6 +5,7 @@ const Promise = require('bluebird');
 const bcrypt = Promise.promisifyAll(require('bcrypt'));
 const authConfig = require('../config/auth-config');
 require('./post');
+require('./group');
 
 function initialize() {
   this.on('saving', model => {
@@ -26,11 +27,16 @@ function posts() {
   return this.hasMany('Post');
 }
 
+function groups() {
+  return this.belongsToMany('Group');
+}
+
 const User = bookshelf.Model.extend({
   tableName: 'users',
   validPassword,
   initialize,
-  posts
+  posts,
+  groups
 });
 
 module.exports = bookshelf.model('User', User);
