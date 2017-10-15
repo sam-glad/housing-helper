@@ -22,13 +22,13 @@ router.get('/', passport.authenticate('jwt', { session: false }), async (req, re
 // Retrieve one group
 router.get('/:id', passport.authenticate('jwt', { session: false }), async (req, res) => {
   try {
-    const group = await retrieveGroupWithUsers(req.params.id);
+    const groupWithUsers = await retrieveGroupWithUsers(req.params.id);
     if (!authenticatedUserIsInGroup(groupWithUsers, req.user.id)) {
       return res.status(401).json('Unauthorized');
     }
 
     // We only needed the users for the check above, so we just return the group
-    return res.json(group.omit('users'));
+    return res.json(groupWithUsers.omit('users'));
   }
   catch(error) {
     console.log(error)
