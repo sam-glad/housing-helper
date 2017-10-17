@@ -1,4 +1,5 @@
 'use strict';
+
 const Bookshelf = require('../../db/bookshelf');
 require('./user');
 require('./group');
@@ -11,11 +12,11 @@ function user() {
   return this.belongsTo('User');
 }
 
-const GroupMembership = Bookshelf.Model.extend({
+const GroupUser = Bookshelf.Model.extend({
   tableName: 'groups',
   hasTimestamps: true,
   group,
   user
 });
 
-module.exports = Bookshelf.model('GroupMembership', GroupMembership);
+module.exports = Bookshelf.model('GroupUser', GroupUser);

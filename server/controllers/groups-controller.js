@@ -22,7 +22,8 @@ router.get('/', passport.authenticate('jwt', { session: false }), async (req, re
 // Retrieve one group
 router.get('/:id', passport.authenticate('jwt', { session: false }), async (req, res) => {
   try {
-    const groupWithUsers = await retrieveGroupWithUsers(req.params.id);
+    const groupWithUsers = await new Group().retrieveWithUsers(req.params.id);
+
     if (!authenticatedUserIsInGroup(groupWithUsers, req.user.id)) {
       return res.status(401).json('Unauthorized');
     }
@@ -36,10 +37,13 @@ router.get('/:id', passport.authenticate('jwt', { session: false }), async (req,
   }
 });
 
+// Get all users in a single group
 router.get('/:id/users', passport.authenticate('jwt', { session: false }), async (req, res) => {
   try {
-    const groupWithUsers = await retrieveGroupWithUsers(req.params.id);
-    if (!authenticatedUserIsInGroup(groupWithUsers, req.user.id)) {
+    const group = new Group();
+    const groupWithUsers = await group.retrieveWithUsers(req.params.id);
+
+    if (!group.hasUser(groupWithUsers, req.user.id)) {
       return res.status(401).json('Unauthorized');
     }
 
@@ -55,7 +59,6 @@ router.get('/:id/users', passport.authenticate('jwt', { session: false }), async
 // TODO: user_id (as created_by)
 router.post('/', passport.authenticate('jwt', { session: false }), async (req, res) => {
   try {
-    console.log('Here we go');
     let group = new Group();
 
     const insertedGroup = await group.save({
@@ -73,18 +76,28 @@ router.post('/', passport.authenticate('jwt', { session: false }), async (req, r
   }
 });
 
-async function retrieveGroupWithUsers(groupId) {
-  return await Group.where('id', groupId).fetch({
-    withRelated: [{'users': function(qb) {
-      // Don't send the users' passwords :)
-      qb.column('users.id', 'username');
-    }}]
-  });
-}
+// // TODO: Keep this? This feels sloppy re: REST conventions
+// // Alternative right now is to POST /groups-users/
+// router.patch('/:id/users', passport.authenticate('jwt', { session: false }), async (req, res) => {
+//   try {
+//     const group = new Group();
+//     const groupWithUsers = await group.retrieveWithUsers(req.params.id);
 
-// groupWithUsers: fetched group with related users
-function authenticatedUserIsInGroup(groupWithUsers, authenticatedUserId) {
-  return groupWithUsers.related('users').filter(user => user.id === authenticatedUserId);  
-}
+//     if (!group.hasUser(groupWithUsers, req.user.id)) {
+//       return res.status(401).json('Unauthorized');
+//     }
+
+//     const userIds = req.body.users.map(user => user.id);
+
+//     await groupWithUsers.users().attach(userIds);
+//     // TODO: Don't make the same goddamned query
+//     // Figure out how to return JSON of the updated group with users
+//     return res.json(await group.retrieveWithUsers(req.params.id));
+//   }
+//   catch(error) {
+//     console.log(error)
+//     res.status(400);
+//   }
+// });
 
 module.exports = router;
