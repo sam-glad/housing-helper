@@ -24,7 +24,7 @@ router.get('/', passport.authenticate('jwt', { session: false }), async (req, re
 router.get('/:id', passport.authenticate('jwt', { session: false }), async (req, res) => {
   try {
     const post = await Post.where( 'id', req.params.id).fetch();
-    if (post.attributes.user_id === req.user.id) {
+    if (post && post.attributes.user_id === req.user.id) {
       return res.status(200).json(post);
     }
     return res.status(401).send('Unauthorized');
