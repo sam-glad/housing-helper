@@ -22,10 +22,13 @@ router.post('/login', (req, res) => {
 
 // TODO: catch sql errors
 router.post('/register', async (req, res) => {
+  const nameFirst = req.body.nameFirst.trim();
+  const nameLast = req.body.nameLast.trim();
   const userFromRequest = { 
     email_address: req.body.emailAddress,
-    name_first: req.body.nameFirst,
-    name_last: req.body.nameLast,
+    name_first: nameFirst,
+    name_last: nameLast,
+    name_full: `${nameFirst} ${nameLast}`,
     password: req.body.password
   };
   const user = await User.forge(userFromRequest).save();

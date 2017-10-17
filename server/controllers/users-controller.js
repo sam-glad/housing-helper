@@ -8,15 +8,19 @@ const User = require('../models/user');
 
 router.get('/', passport.authenticate('jwt', { session: false }), async (req, res) => {
   try {
-    let user;
-    if (req.query.username) {
-      user = await User.where('username', req.query.username).fetch();
+    let users;
+    if (req.query.emailAddress) {
+      users = await User.where('email_address', req.query.emailAddress).fetchAll();
+    } else if (req.query.name) {
+      users = await User.query((qb) => {
+        qb.where('name_full', 'LIKE', `%${req.query.name}%`);
+      }).fetchAll();
     }
-    res.json(user);
+    res.json(users);
   }
   catch(error) {
     console.log(error);
-    res.json(400);
+    res.status(400);
   }
 });
 
