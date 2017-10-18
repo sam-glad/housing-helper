@@ -5,16 +5,14 @@ const router = express.Router();
 const passport = require('passport');
 
 const Post = require('../models/post');
-const User = require('../models/user');
 
 // TODO: catch sql errors
-// Retrieve all posts added by authenticated user
+// Retrieve all posts belonging to the user's groups
 router.get('/', passport.authenticate('jwt', { session: false }), async (req, res) => {
   try {
-    const posts = await Post.where('user_id', req.user.id).fetchAll();
+    const posts = await new GroupUser().where('user_id', req.user.id).fetchAll({ withRelated:('group.posts') });
     res.json(posts);
   }
-  // TODO: Don't actually send the error
   catch(error) {
     console.log(error)
     res.status(400);
@@ -57,7 +55,6 @@ router.post('/', passport.authenticate('jwt', { session: false }), async (req, r
     });
     res.status(201).json(insertedPost.toJSON());
   }
-  // TODO: Don't actually send the error
   catch(error) {
     console.log(error);
     res.status(400);
