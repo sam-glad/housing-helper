@@ -13,7 +13,7 @@ function user() {
 }
 
 const GroupUser = Bookshelf.Model.extend({
-  tableName: 'groups',
+  tableName: 'groups_users',
   hasTimestamps: true,
   group,
   user
