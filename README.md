@@ -78,7 +78,7 @@ curl -X GET \
 * Returns `401 Unauthorized` if user is not in group specified by ID or if the authenticated (via token) user is not in that group
 * Otherwise, returns the group specified by ID with its users
 
-## Group Memberships
+### Group Memberships
 
 **Add a user to a group**:
 
@@ -96,7 +96,7 @@ curl -X POST \
 * Returns `401 Unauthorized` if user is not in group specified by `group_id` in payload
 * Otherwise, returns the inserted *group-user* (membership - just a join table between groups and users) record
 
-## Posts
+### Posts
 
 **Create a post:**
 
@@ -127,14 +127,13 @@ curl -X POST \
 
 ```
 curl -X GET \
-  https://housinghelper.herokuapp.com/api/posts/:post_id \
+  https://housinghelper.herokuapp.com/api/posts \
   -H 'authorization: Bearer <YOUR-TOKEN-HERE>' \
   -H 'content-type: application/json'
 ```
 
 * Returns `401 Unauthorized` if a valid token is not provided
-* Otherwise, returns an array of all posts inserted by the user authenticated via the token
-
+* Otherwise, returns an array of all posts belonging to the authenticated user's groups
 
 **Retrieve one post:**
 
