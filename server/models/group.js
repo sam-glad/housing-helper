@@ -1,18 +1,31 @@
 'use strict';
+
 const Bookshelf = require('../../db/bookshelf');
 require('./user');
+require('./post');
 
 function users() {
   return this.belongsToMany('User');
+}
+
+function posts() {
+  return this.hasMany('Post');
 }
 
 async function retrieveWithUsers(groupId) {
   return await this.where('id', groupId).fetch({
     withRelated: [{'users': function(qb) {
       // Don't send the users' passwords :)
-      qb.column('users.id', 'username');
+      qb.column('users.id', 'name_first', 'name_last', 'name_full');
     }}]
   });
+}
+
+async function retrieveWithPosts(groupId, includeUsers) {
+  if (!includeUsers) {
+    return await this.where('id', groupId).fetch({ withRelated: 'posts' });
+  }
+  return await this.where('id', groupId).fetch({ withRelated: ['posts', 'users'] });
 }
 
 function hasUser(groupWithUsers, authenticatedUserId) {
@@ -23,7 +36,9 @@ const Group = Bookshelf.Model.extend({
   tableName: 'groups',
   hasTimestamps: true,
   users,
+  posts,
   retrieveWithUsers,
+  retrieveWithPosts,
   hasUser
 });
 

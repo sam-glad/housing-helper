@@ -52,7 +52,8 @@ router.post('/', passport.authenticate('jwt', { session: false }), async (req, r
       housingType: req.body.housingType,
       url: req.body.url,
       craigslistPostId: req.body.craigslistPostId,
-      user_id: req.user.id
+      user_id: req.user.id,
+      group_id: req.body.groupId
     });
     res.status(201).json(insertedPost.toJSON());
   }

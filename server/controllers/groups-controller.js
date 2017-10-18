@@ -38,6 +38,27 @@ router.get('/:id', passport.authenticate('jwt', { session: false }), async (req,
   }
 });
 
+// Get all posts in a single group
+router.get('/:id/posts', passport.authenticate('jwt', { session: false }), async (req, res) => {
+  try {
+    const group = new Group();
+    const groupWithPostsAndUsers = await group.retrieveWithPosts(req.params.id, true);
+
+    if (!groupWithPostsAndUsers || !group.hasUser(groupWithPostsAndUsers, req.user.id)) {
+      return res.status(401).send('Unauthorized');
+    }
+
+    // Omitting users also omits posts... have to look into this,
+    // but including both for now, since that's better than neither
+    return res.json(groupWithPostsAndUsers);
+
+  }
+  catch(error) {
+    console.log(error)
+    res.status(400);
+  }
+});
+
 // Get all users in a single group
 router.get('/:id/users', passport.authenticate('jwt', { session: false }), async (req, res) => {
   try {
