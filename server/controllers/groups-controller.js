@@ -48,8 +48,8 @@ router.get('/:id/posts', passport.authenticate('jwt', { session: false }), async
       return res.status(401).send('Unauthorized');
     }
 
-    // Omitting users also omits posts... have to look into this,
-    // but including both for now, since that's better than neither
+    // HACK: groupWithPostsAndUsers.omit('users') also omits posts
+    delete groupWithPostsAndUsers.relations.users;
     return res.json(groupWithPostsAndUsers);
 
   }
