@@ -10,11 +10,11 @@ const Promise = require('bluebird');
 
 router.post('/login', (req, res) => {
   Promise.coroutine(function* () {
-    const user = yield User.where('email_address', req.body.emailAddress).fetch();
+    const user = yield User.where('email_address', req.body.email_address).fetch();
     const isValidPassword = yield user.validPassword(req.body.password);
     if (isValidPassword) {
       const token = jwt.encode(user.omit('password'), authConfig.jwtSecret);
-      res.json({success: true, token: `JWT ${token}`});
+      res.json({success: true, token: `${token}`});
     } else {
       res.json({success: false, msg: 'Authentication failed'});
     }
@@ -23,13 +23,11 @@ router.post('/login', (req, res) => {
 
 // TODO: catch sql errors
 router.post('/register', async (req, res) => {
-  const nameFirst = req.body.nameFirst.trim();
-  const nameLast = req.body.nameLast.trim();
   const userFromRequest = { 
-    email_address: req.body.emailAddress,
-    name_first: nameFirst,
-    name_last: nameLast,
-    name_full: `${nameFirst} ${nameLast}`,
+    email_address: req.body.email_address,
+    name_first: req.body.name_first,
+    name_last: req.body.name_last,
+    name_full: `${req.body.name_first} ${req.body.name_last}`,
     password: req.body.password
   };
   const user = await User.forge(userFromRequest).save();

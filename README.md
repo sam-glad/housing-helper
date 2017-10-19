@@ -13,10 +13,10 @@ curl -X POST \
   https://housinghelper.herokuapp.com/api/auth/register \
   -H 'content-type: application/json' \
   -d '{
-  "emailAddress":"developer@example.com",
-  "nameFirst":"John",
-  "nameLast":"Smith",
-  "password":"admin"
+  "name_first":"Test",
+  "name_last":"Test",
+  "email_address":"foo@example.com",
+  "password":"test"
 }'
 ```
 
@@ -28,14 +28,14 @@ curl -X POST \
 ```
 curl -X POST \
   https://housinghelper.herokuapp.com/api/auth/login \
-  -H 'authorization: Bearer <YOUR-TOKEN-HERE>' \
   -H 'content-type: application/json' \
   -d '{
-  "emailAddress":"developer@example.com",
+  "email_address":"developer@example.com",
   "password":"test"
 }'
 ```
 
+* Credentials provided must be for a registered user (see above)
 * Returns a token which must be used to authenticate most requests as the value for the *Authorization* header
 
 ### Groups
