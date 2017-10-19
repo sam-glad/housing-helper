@@ -6,6 +6,7 @@ const passport = require('passport');
 
 const GroupUser = require('../models/group-user');
 const Group = require('../models/group');
+const Post = require('../models/post');
 
 router.post('/', passport.authenticate('jwt', { session: false }), async (req, res) => {
   try {
@@ -13,7 +14,7 @@ router.post('/', passport.authenticate('jwt', { session: false }), async (req, r
     const groupWithUsers = await group.retrieveWithUsers(req.body.group_id);
 
     if (!group.hasUser(groupWithUsers, req.user.id)) {
-      return res.status(401).json('Unauthorized');
+      return res.status(401).send();
     }
 
     const userIds = req.body.users.map(user => user.id);
@@ -33,15 +34,21 @@ router.delete('/', passport.authenticate('jwt', { session: false }), async (req,
   try {
     const group = new Group();
     const groupWithUsers = await group.retrieveWithUsers(req.body.group_id);
-    const groupUser = await GroupUser.where({ group_id: req.body.group_id, user_id: req.user.id });
+    const groupUser = await GroupUser.where({ group_id: req.body.group_id, user_id: req.user.id }).fetch();
     let responseBody;
 
     if (!groupWithUsers.attributes.is_just_me) {
       await groupUser.destroy();
-      responseBody = { membershipDeleted: true }
+      responseBody = { 
+        membershipDeleted: true,
+        groupDeleted: false,
+        groupPostsDeleted: true
+      };
 
       // Destroy group if authenticated user is the only one
       if (groupWithUsers.related('users').length === 1 && groupWithUsers.related('users').models[0].id === req.user.id) {
+        await Post.where('group_id', req.body.group_id).destroy();
+        responseBody.groupPostsDeleted = true;
         await groupWithUsers.destroy();
         responseBody.groupDeleted = true;
       }
@@ -50,6 +57,7 @@ router.delete('/', passport.authenticate('jwt', { session: false }), async (req,
       return res.status(400).send();
     }
 
+    // FIXME
     return res.status(204).json(responseBody);
   }
   catch(error) {

@@ -6,7 +6,7 @@ This documentation is an extremely bare-bones placeholder pending proper API doc
 
 ### Auth
 
-**Register a new account:**
+**Register a new account**
 
 ```
 curl -X POST \
@@ -21,8 +21,9 @@ curl -X POST \
 ```
 
 * Returns the inserted user (without password)
+* Also inserts a related group named "Just Me" which cannot be deleted (default group for posts)
 
-**Login:**
+**Login**
 
 ```
 curl -X POST \
@@ -39,7 +40,7 @@ curl -X POST \
 
 ### Groups
 
-**Create:**
+**Create**
 
 ```
 curl -X GET \
@@ -54,7 +55,7 @@ curl -X GET \
 * Returns the inserted group
 * Automatically assigns the authenticated user to that group
 
-**Retrieve one group:**
+**Retrieve one group**
 
 ```
 curl -X GET \
@@ -66,7 +67,7 @@ curl -X GET \
 * Returns `401 Unauthorized` if user is not in group specified by ID or if the authenticated (via token) user is not in that group
 * Otherwise, returns the group specified by ID
 
-**Retrieve one group with its users:**
+**Retrieve one group with its users**
 
 ```
 curl -X GET \
@@ -80,7 +81,7 @@ curl -X GET \
 
 ### Group Memberships
 
-**Add a user to a group**:
+**Add a user to a group**
 
 ```
 curl -X POST \
@@ -96,9 +97,26 @@ curl -X POST \
 * Returns `401 Unauthorized` if user is not in group specified by `group_id` in payload
 * Otherwise, returns the inserted *group-user* (membership - just a join table between groups and users) record
 
+**Remove oneself from a group**
+
+```
+curl -X DELETE \
+  https://housinghelper.herokuapp.com/api/groups-users/ \
+  -H 'authorization: Bearer <YOUR-TOKEN-HERE>' \
+  -H 'content-type: application/json' \
+  -d '{
+  "group_id": <GROUP-ID-HERE>
+}'
+```
+
+* Returns `400 Bad Request` if the authenticated (via token) user is not in the group specified by the payload's `group_id`
+* Returns `400 Bad Request` if the group is a permanent ("Just Me") group, which is created upon user registration
+* Otherwise, removes the user from the group specified by the payload's `group_id`
+  * Also deletes the group in question (with its posts) if authenticated user was the only one in it
+
 ### Posts
 
-**Create a post:**
+**Create a post**
 
 ```
 curl -X POST \
@@ -123,7 +141,7 @@ curl -X POST \
 * Returns `401 Unauthorized` if a valid token is not provided
 * Otherwise, returns the inserted post
 
-**Retrieve all of the authenticated user's posts:**
+**Retrieve all of the authenticated user's posts**
 
 ```
 curl -X GET \
@@ -135,7 +153,7 @@ curl -X GET \
 * Returns `401 Unauthorized` if a valid token is not provided
 * Otherwise, returns an array of all posts belonging to the authenticated user's groups
 
-**Retrieve one post:**
+**Retrieve one post**
 
 ```
 curl -X GET \
