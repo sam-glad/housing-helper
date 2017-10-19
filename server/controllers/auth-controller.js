@@ -34,8 +34,8 @@ router.post('/register', async (req, res) => {
   };
   const user = await User.forge(userFromRequest).save();
   // Add user's default group
-  const soloGroup = await Group.forge({ name: 'Just Me' }).save();
-  const retrievedGroup = await Group.where({ id:soloGroup.id }).fetch();
+  const soloGroup = await Group.forge({ name: 'Just Me', is_just_me: true }).save();
+  const retrievedGroup = await Group.where({ id: soloGroup.id }).fetch();
   retrievedGroup.users().attach(user.id);
   res.json(user.omit('password'));
 });
