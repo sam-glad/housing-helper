@@ -39,6 +39,8 @@ router.post('/', passport.authenticate('jwt', { session: false }), async (req, r
   try {
     let post = new Post();
 
+    // TODO: Default group_id to that of the user's permanent solo group
+
     const insertedPost = await post.save({
       title: req.body.title,
       price: req.body.price,
