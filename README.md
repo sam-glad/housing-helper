@@ -43,12 +43,11 @@ curl -X POST \
 **Create**
 
 ```
-curl -X GET \
+curl -X POST \
   https://housinghelper.herokuapp.com/api/groups \
   -H 'authorization: Bearer <YOUR-TOKEN-HERE>' \
   -d '{
-  "emailAddress":"developer@example.com",
-  "password":"test"
+  "name":"My Shockingly Exclusive Group"
 }'
 ```
 
@@ -71,13 +70,25 @@ curl -X GET \
 
 ```
 curl -X GET \
-  https://housinghelper.herokuapp.com/api/groups/:id \
+  https://housinghelper.herokuapp.com/api/groups/:id/users \
   -H 'authorization: Bearer <YOUR-TOKEN-HERE>'
 }'
 ```
 
 * Returns `401 Unauthorized` if user is not in group specified by ID or if the authenticated (via token) user is not in that group
 * Otherwise, returns the group specified by ID with its users
+
+**Retrieve one group with its posts**
+
+```
+curl -X GET \
+  https://housinghelper.herokuapp.com/api/groups/:id/posts \
+  -H 'authorization: Bearer <YOUR-TOKEN-HERE>'
+}'
+```
+
+* Returns `401 Unauthorized` if user is not in group specified by ID or if the authenticated (via token) user is not in that group
+* Otherwise, returns group specified by ID with its posts
 
 ### Group Memberships
 
