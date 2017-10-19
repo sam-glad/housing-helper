@@ -141,11 +141,11 @@ curl -X POST \
   "bathrooms":2,
   "price":1000,
   "address":"123 Fake St.",
-  "squareFootage":1500,
+  "square_footage":1500,
   "parking":"garage",
-  "housingType":"house",
+  "housing_type":"house",
   "url":"foo.craigslist.org/apa/1",
-  "craigslistPostId":1
+  "craigslist_post_id":1
 }'
 ```
 

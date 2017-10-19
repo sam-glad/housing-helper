@@ -47,13 +47,13 @@ router.post('/', passport.authenticate('jwt', { session: false }), async (req, r
       address: req.body.address,
       bedrooms: req.body.bedrooms,
       bathrooms: req.body.bathrooms,
-      squareFootage: req.body.squareFootage,
+      squareFootage: req.body.square_footage,
       parking: req.body.parking,
-      housingType: req.body.housingType,
+      housingType: req.body.housing_type,
       url: req.body.url,
-      craigslistPostId: req.body.craigslistPostId,
+      craigslistPostId: req.body.craigslist_post_id,
       user_id: req.user.id,
-      group_id: req.body.groupId
+      group_id: req.body.group_id
     });
     res.status(201).json(insertedPost.toJSON());
   }

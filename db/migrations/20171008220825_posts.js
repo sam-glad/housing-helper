@@ -6,7 +6,7 @@ exports.up = function(knex, Promise) {
     table.string('address').unique();
     table.integer('bedrooms').notNullable();
     table.integer('bathrooms').notNullable();
-    table.integer('squareFootage')
+    table.integer('squareFootage');
     table.string('parking');
     table.string('housingType');
     table.string('url').unique().notNullable();
