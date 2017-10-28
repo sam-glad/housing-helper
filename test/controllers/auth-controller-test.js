@@ -1,6 +1,5 @@
 process.env.NODE_ENV = 'test';
 
-// Require the dev-dependencies
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const server = require('../app.js');
@@ -12,17 +11,6 @@ const GroupUser = require('../server/models/group-user');
 const Group = require('../server/models/group');
 
 chai.use(chaiHttp);
-
-// async function createValidUser() {
-//   const user = {
-//                  name_first: 'First name',
-//                  name_last: 'Last name',
-//                  name_full: 'First name Last name', // TODO: Automate this... good lord
-//                  email_address: 'test@example.com',
-//                  password: 'pass'
-//                };
-//   return await User.forge(user).save(user);
-// }
 
 describe('Auth', () => {
     beforeEach(async () => {
