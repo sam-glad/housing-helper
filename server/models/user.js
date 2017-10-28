@@ -6,6 +6,7 @@ const bcrypt = Promise.promisifyAll(require('bcrypt'));
 const authConfig = require('../config/auth-config');
 require('./post');
 require('./group');
+require('./group-user');
 
 function initialize() {
   this.on('saving', model => {
@@ -28,7 +29,7 @@ function posts() {
 }
 
 function groups() {
-  return this.belongsToMany('Group');
+  return this.belongsToMany('Group').through('GroupUser');
 }
 
 const User = bookshelf.Model.extend({

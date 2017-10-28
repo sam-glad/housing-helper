@@ -6,7 +6,7 @@
   "scripts": {
     "start:dev": "nodemon ./bin/www",
     "start": "node ./bin/www",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "nyc mocha"
   },
   "keywords": [],
   "author": "",
@@ -21,12 +21,16 @@
     "jwt-simple": "^0.5.1",
     "knex": "^0.13.0",
     "morgan": "^1.8.2",
+    "nyc": "^11.2.1",
     "passport": "^0.4.0",
     "passport-jwt": "^3.0.0",
     "pg": "^7.3.0",
     "pg-hstore": "^2.3.2"
   },
   "devDependencies": {
+    "chai": "^4.1.2",
+    "chai-http": "^3.0.0",
+    "mocha": "^4.0.1",
     "nodemon": "^1.12.1"
   },
   "engines": {

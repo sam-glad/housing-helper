@@ -3,9 +3,10 @@
 const Bookshelf = require('../../db/bookshelf');
 require('./user');
 require('./post');
+require('./group-user');
 
 function users() {
-  return this.belongsToMany('User');
+  return this.belongsToMany('User').through('GroupUser');
 }
 
 function posts() {
