@@ -2,29 +2,28 @@ process.env.NODE_ENV = 'test';
 
 const chai = require('chai');
 const chaiHttp = require('chai-http');
-const server = require('../app.js');
+const server = require('../../app.js');
 const should = chai.should();
 const expect = chai.expect;
 
-const User = require('../server/models/user');
-const GroupUser = require('../server/models/group-user');
-const Group = require('../server/models/group');
+const User = require('../../server/models/user');
+const GroupUser = require('../../server/models/group-user');
+const Group = require('../../server/models/group');
+
+const userHelper = require('../helpers/user-helper');
+
 
 chai.use(chaiHttp);
 
 describe('Auth', () => {
     beforeEach(async () => {
-      await User.where('id', '!=', '0').destroy();
+      await userHelper.deleteAllUsers();
       await Group.where('id', '!=', '0').destroy();
     });
   describe('POST /auth/register', () => {
       it('should register a new user with valid credentials', (done) => {
-        const user = {
-                       name_first: 'First name', 
-                       name_last: 'Last name', 
-                       email_address: 'test@example.com',
-                       password: 'pass'
-                     };
+        const user = userHelper.buildUser();
+        console.log(JSON.stringify(user));
         chai.request(server)
             .post('/api/auth/register')
             .send(user)
@@ -52,13 +51,7 @@ describe('Auth', () => {
 
   describe('POST /auth/login', () => {
     it('should allow an existing user with valid credentials to log in', async () => {
-      const user = {
-                 name_first: 'First name',
-                 name_last: 'Last name',
-                 name_full: 'First name Last name', // TODO: Automate this... good lord
-                 email_address: 'test@example.com',
-                 password: 'pass'
-               };
+      const user = userHelper.buildUser()
       await User.forge(user).save();      
       const body = {
         email_address: user.email_address,
