@@ -11,19 +11,18 @@ const GroupUser = require('../../server/models/group-user');
 const Group = require('../../server/models/group');
 
 const userHelper = require('../helpers/user-helper');
-
+const groupHelper = require('../helpers/group-helper');
 
 chai.use(chaiHttp);
 
 describe('Auth', () => {
     beforeEach(async () => {
       await userHelper.deleteAllUsers();
-      await Group.where('id', '!=', '0').destroy();
+      await groupHelper.deleteAllGroups();
     });
   describe('POST /auth/register', () => {
       it('should register a new user with valid credentials', (done) => {
         const user = userHelper.buildUser();
-        console.log(JSON.stringify(user));
         chai.request(server)
             .post('/api/auth/register')
             .send(user)
