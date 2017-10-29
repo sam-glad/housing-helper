@@ -4,6 +4,6 @@ node_js:
 services:
 - postgresql
 before_script:
-  - psql -c 'create database "housing-test";' -U postgres
+  - psql -c 'create database "housing-test";' -U postgres && knex migrate:latest --env test
 env:
 - JWT_SECRET=FOOBAR
