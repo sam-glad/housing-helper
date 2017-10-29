@@ -6,25 +6,24 @@ const jwt = require('jwt-simple');
 const authConfig = require('../config/auth-config');
 const User = require('../models/user');
 const Group = require('../models/group');
-const Promise = require('bluebird');
 
-router.post('/login', (req, res) => {
-  Promise.coroutine(function* () {
-    const user = yield User.where('email_address', req.body.email_address).fetch();
-    const isValidPassword = yield user.validPassword(req.body.password);
+router.post('/login', async (req, res) => {
+  try {
+    const user = await User.where('email_address', req.body.email_address).fetch();
+    const isValidPassword = await user.validPassword(req.body.password);
     if (isValidPassword) {
       const token = jwt.encode(user.omit('password'), authConfig.jwtSecret);
       res.json({success: true, token: `${token}`});
     } else {
       res.status(401).json({success: false, msg: 'Authentication failed'});
     }
-  })().catch(err => {
-    console.log(err);
+  }
+  catch(error) {
+    console.log(error);
     res.status(401).send();
-  });
+  }
 });
 
-// TODO: catch sql errors
 router.post('/register', async (req, res) => {
   try {
     const userFromRequest = { 

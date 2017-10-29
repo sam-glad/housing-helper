@@ -2,7 +2,8 @@
 
 const bookshelf = require('../../db/bookshelf');
 const Promise = require('bluebird');
-const bcrypt = Promise.promisifyAll(require('bcrypt'));
+const bcrypt = require('bcrypt');
+const promisifiedBcrypt = Promise.promisifyAll(require('bcrypt'));
 const authConfig = require('../config/auth-config');
 require('./post');
 require('./group');
@@ -13,15 +14,15 @@ function initialize() {
     if (!model.hasChanged('password')) return;
 
     return Promise.coroutine(function* () {
-      const salt = yield bcrypt.genSaltAsync(authConfig.saltRounds);
-      const hashedPassword = yield bcrypt.hashAsync(model.attributes.password, salt);
+      const salt = yield promisifiedBcrypt.genSaltAsync(authConfig.saltRounds);
+      const hashedPassword = yield promisifiedBcrypt.hashAsync(model.attributes.password, salt);
       model.set('password', hashedPassword);
     })();
   });
 }
 
-function validPassword(password) {
-  return bcrypt.compareAsync(password, this.attributes.password);
+async function validPassword(password) {
+  return await bcrypt.compare(password, this.attributes.password);
 }
 
 function posts() {
