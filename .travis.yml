@@ -1,5 +1,9 @@
 language: node_js
 node_js:
  - "node"
+services:
+- postgresql
+before_script:
+  - psql -c 'create database housing-test;' -U postgres
 env:
 - JWT_SECRET=FOOBAR
