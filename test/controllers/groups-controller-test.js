@@ -51,7 +51,7 @@ describe('Groups', () => {
       const token = await userHelper.getTokenForUser(user.email_address, user.password);
 
       chai.request(server)
-        .get(`/api/groups/${groupId}}`)
+        .get(`/api/groups/${groupId}`)
         .set('Authorization', `Bearer ${token}`)
         .end((err, res) => {
           res.should.have.status(200);
