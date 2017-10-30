@@ -45,18 +45,13 @@ describe('Groups', () => {
     it('should retrieve one group when the user is a member of it', async () => {
       const user = userHelper.buildUser();
       await User.forge(user).save();
-
-      const group = groupHelper.buildGroup();
-      await Group.forge(group).save();
-      const allGroups = await Group.fetchAll();
-      const groupToAttach = allGroups.models[0];
-      const userToAttach = await User.where('email_address', '!=', user.email_address).fetch();
-      groupToAttach.users().attach(userToAttach);
-
+      const groupsToSaveSequence = [1];
+      const groups = await groupHelper.buildGroups(1, groupsToSaveSequence);
+      const groupId = groups.filter(group => { return group.attached === true })[0].id;
       const token = await userHelper.getTokenForUser(user.email_address, user.password);
 
       chai.request(server)
-        .get(`/api/groups/${groupToAttach.id}`)
+        .get(`/api/groups/${groupId}}`)
         .set('Authorization', `Bearer ${token}`)
         .end((err, res) => {
           res.should.have.status(200);
