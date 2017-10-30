@@ -1,3 +1,8 @@
+<div align="center">
+[![Build Status](https://travis-ci.org/sam-glad/housing-helper.svg?branch=master)](https://travis-ci.org/sam-glad/housing-helper)
+[![Coverage Status](https://coveralls.io/repos/github/sam-glad/housing-helper/badge.svg?branch=master)](https://coveralls.io/github/sam-glad/housing-helper?branch=master)
+</div>
+
 ## NOTE
 
 This documentation is an extremely bare-bones placeholder pending proper API docs. It should get you to the point where you can use the API without too much trouble, but in the near future, full documentation will include full sample requests, full sample responses, and examples of how to use information retrieved from one request to make subsequent requests.
