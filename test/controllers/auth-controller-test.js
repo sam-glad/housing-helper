@@ -57,29 +57,29 @@ describe('Auth', () => {
         password: user.password
       };
 
-      chai.request(server)
+      const res = await chai.request(server)
         .post('/api/auth/login')
-        .send(body)
-        .end((err, res) => {
-          res.should.have.status(200);
-          expect(res.body.token).to.be.a('string');
-        });
+        .send(body);
+
+        res.should.have.status(200);
+        expect(res.body.token).to.be.a('string');
     });
 
-    it('should not return a token for a request with invalid credentials', (done) => {
+    it('should not return a token for a request with invalid credentials', async () => {
       const invalidUser = {
         email_address: 'test@example.com',
         password: 'WROOOONG!'
       };
-      chai.request(server)
-      .post('/api/auth/login')
-      .send(invalidUser)
-      .end((err, res) => {
-        res.should.have.status(401);
-        expect(res.body.token).to.not.exist;
-        done();
-      });
-    });
-  });
 
+      // try-catch due to superagent being a presumptious putz:
+      // https://github.com/chaijs/chai-http/issues/75
+      try {
+        const res = await chai.request(server)
+        .post('/api/auth/login')
+        .send(invalidUser);
+      } catch(res) {
+        res.should.have.status(401);
+      }
+    }); // it...
+  });
 });

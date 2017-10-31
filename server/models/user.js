@@ -4,6 +4,8 @@ const bookshelf = require('../../db/bookshelf');
 const Promise = require('bluebird');
 const bcrypt = require('bcrypt');
 const promisifiedBcrypt = Promise.promisifyAll(require('bcrypt'));
+const jwt = require('jwt-simple');
+
 const authConfig = require('../config/auth-config');
 require('./post');
 require('./group');
@@ -23,6 +25,13 @@ function initialize() {
 
 async function validPassword(password) {
   return await bcrypt.compare(password, this.attributes.password);
+}
+
+async function constructToken(passwordFromInput) {
+  const isValidPassword = await validPassword(req.body.password);
+  if (isValidPassword) {
+    return jwt.encode(user.omit('password'), authConfig.jwtSecret);
+  }
 }
 
 function posts() {

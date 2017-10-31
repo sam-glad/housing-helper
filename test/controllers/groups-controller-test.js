@@ -12,7 +12,6 @@ const Group = require('../../server/models/group');
 const userHelper = require('../helpers/user-helper');
 const groupHelper = require('../helpers/group-helper');
 
-
 chai.use(chaiHttp);
 
 describe('Groups', () => {
@@ -43,21 +42,20 @@ describe('Groups', () => {
     }); // it should...
 
     it('should retrieve one group when the user is a member of it', async () => {
-      const user = userHelper.buildUser();
-      await User.forge(user).save();
-      const groupsToSaveSequence = [1];
-      const groups = await groupHelper.buildGroups(1, groupsToSaveSequence);
-      const groupId = groups.filter(group => { return group.attached === true })[0].id;
-      const token = await userHelper.getTokenForUser(user.email_address, user.password);
+      const userToSave = userHelper.buildUser();
+      const user = await User.forge(userToSave).save();
+      const token = require('jwt-simple').encode(user.omit('password'), require('../../server/config/auth-config').jwtSecret);
+      const firstGroup = await Group.forge({ name: 'Connected group' }).save();
+      const attachment = await firstGroup.users().attach(user);
+      const secondGroup = await Group.forge({ name: 'Unrelated group' }).save();
 
-      chai.request(server)
-        .get(`/api/groups/${groupId}`)
-        .set('Authorization', `Bearer ${token}`)
-        .end((err, res) => {
-          res.should.have.status(200);
-          res.body.should.be.an('object');
-          res.body.id.should.equal(groupToAttach.id);
-        });
+      const response = await chai.request(server)
+        .get(`/api/groups/${firstGroup.id}`)
+        .set('Authorization', `Bearer ${token}`);
+
+      response.should.have.status(200);
+      response.body.id.should.equal(firstGroup.id);
+      response.body.name.should.equal(firstGroup.attributes.name);      
     }); // it should...
 
   }); // describe 'GET /groups/:id
@@ -84,25 +82,24 @@ describe('Groups', () => {
 
     it('should retrieve all of an authenticated user\'s groups and no others', async () => {
       // GIVEN two groups and a user as a member of ONE of them...
-      const user = userHelper.buildUser();
-      await User.forge(user).save();
-      const groupsToSaveSequence = [1];
-      const groups = await groupHelper.buildGroups(2, groupsToSaveSequence);
-      const connectedGroupId = groups.filter(group => { return group.attached === true })[0].id;
-      const token = await userHelper.getTokenForUser(user.email_address, user.password);
+      const userToSave = userHelper.buildUser();
+      const user = await User.forge(userToSave).save();
+      const token = require('jwt-simple').encode(user.omit('password'), require('../../server/config/auth-config').jwtSecret);
+      const firstGroup = await Group.forge({ name: 'Connected group' }).save();
+      const attachment = await firstGroup.users().attach(user);
+      const secondGroup = await Group.forge({ name: 'Unrelated group' }).save();
 
       // WHEN that user requests his groups
-      chai.request(server)
+      const res = await chai.request(server)
         .get('/api/groups/')
-        .set('Authorization', `Bearer ${token}`)
-        .end((err, res) => {
-          // THEN he should successfully retrieve ONLY his own group
-          res.should.have.status(200);
-          res.body.should.be.a('array');
-          res.body.length.should.be(1);
-          res.body[0].should.be(connectedGroupId);
-          done();
-        });
+        .set('Authorization', `Bearer ${token}`);
+              
+      // THEN he should successfully retrieve ONLY his own group
+      res.should.have.status(200);
+      res.body.should.be.an('array');
+      res.body.length.should.equal(1);
+      res.body[0].id.should.equal(firstGroup.id);
+      res.body[0].name.should.equal(firstGroup.attributes.name);
     }); // it should...
 
   }); // describe 'GET /groups/'

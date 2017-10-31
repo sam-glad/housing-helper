@@ -30,7 +30,7 @@ async function retrieveWithPosts(groupId, includeUsers) {
 }
 
 function hasUser(groupWithUsers, authenticatedUserId) {
-  return groupWithUsers.related('users').filter(user => user.id === authenticatedUserId);  
+  return groupWithUsers.related('users').filter(user => user.id === authenticatedUserId).length === 1;
 }
 
 const Group = Bookshelf.Model.extend({
