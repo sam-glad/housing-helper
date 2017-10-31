@@ -7,7 +7,7 @@
     "start:dev": "nodemon ./bin/www",
     "start": "node ./bin/www",
     "test": "nyc mocha \"test/**/*.js\" --exit",
-    "coverage": "node node_modules/.bin/istanbul cover node_modules/.bin/_mocha -R test/**/*.js",
+    "coverage": "nyc report --reporter=text-lcov | coveralls",
     "coveralls": "cat ./coverage/lcov.info | node node_modules/.bin/coveralls"
   },
   "keywords": [],
