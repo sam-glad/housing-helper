@@ -12,9 +12,11 @@ function buildUser(sequence) {
                  email_address: 'test@example.com',
                  password: 'pass'
                };
-  if (sequence) {
-    Object.keys(user).forEach(key => {
-      user[key] += sequence;
+  if (sequence || sequence === 0) {
+    Object.keys(user).forEach((key) => {
+      if (typeof(user[key]) === 'string') {
+        user[key] += ` ${sequence}`;
+      }
     });
   }
   return user;
@@ -25,9 +27,8 @@ async function deleteAllUsers() {
 };
 
 // Oh god
-async function getTokenForUser(emailAddress, password) {
+async function getTokenForUser(user, password) {
   try {
-    const user = await User.where('email_address', emailAddress).fetch();
     const isValidPassword = await user.validPassword(password);
     if (isValidPassword) {
       const token = jwt.encode(user.omit('password'), authConfig.jwtSecret);

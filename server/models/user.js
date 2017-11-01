@@ -27,13 +27,6 @@ async function validPassword(password) {
   return await bcrypt.compare(password, this.attributes.password);
 }
 
-async function constructToken(passwordFromInput) {
-  const isValidPassword = await validPassword(req.body.password);
-  if (isValidPassword) {
-    return jwt.encode(user.omit('password'), authConfig.jwtSecret);
-  }
-}
-
 function posts() {
   return this.hasMany('Post');
 }

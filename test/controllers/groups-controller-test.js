@@ -8,9 +8,11 @@ const should = chai.should();
 const User = require('../../server/models/user');
 const GroupUser = require('../../server/models/group-user');
 const Group = require('../../server/models/group');
+const Post = require('../../server/models/post');
 
 const userHelper = require('../helpers/user-helper');
 const groupHelper = require('../helpers/group-helper');
+const postHelper = require('../helpers/post-helper');
 
 chai.use(chaiHttp);
 
@@ -103,5 +105,73 @@ describe('Groups', () => {
     }); // it should...
 
   }); // describe 'GET /groups/'
+
+  describe('GET /groups/:id/posts', () => {
+    it('should return 401 when no token is provided', async () => {
+      // GIVEN a group...
+      const group = await Group.forge({ name: 'One group' }).save();
+
+      // WHEN a tokenless request is made to see its posts...
+
+      // THEN the request should return 401
+      // try-catch due to superagent being a presumptious putz:
+      // https://github.com/chaijs/chai-http/issues/75
+      try {
+        const res = await chai.request(server)
+        .get(`/api/groups/${group.id}/posts`)
+      } catch(res) {
+        res.should.have.status(401);
+      }
+    }); // it should...
+
+    it('should return 401 when a user unconnected to the group is authenticated', async () => {
+      // GIVEN a group...
+      const group = await Group.forge({ name: 'One group' }).save();
+      const userToSave = userHelper.buildUser();
+      const user = await User.forge(userToSave).save();
+      const token = await userHelper.getTokenForUser(user, userToSave.password);
+
+      // WHEN a tokenless request is made to see its posts...
+
+      // THEN the request should return 401
+      // try-catch due to superagent being a presumptious putz:
+      // https://github.com/chaijs/chai-http/issues/75
+      try {
+        const res = await chai.request(server)
+        .get(`/api/groups/${group.id}/posts`)
+        .set('Authorization', `Bearer ${token}`)
+      } catch(res) {
+        res.should.have.status(401);
+      }
+    }); // it should...
+
+    it('should return the group\'s posts when a user connected to the group is authenticated', async () => {
+      // GIVEN a post belonging to a user belonging to a group
+      // and a post belonging to a different user in that same group
+      const group = await Group.forge({ name: 'One group' }).save();
+      const firstUserToSave = userHelper.buildUser('First');
+      const firstUser = await User.forge(firstUserToSave).save();
+      const secondUserToSave = userHelper.buildUser('Second');
+      const secondUser = await User.forge(secondUserToSave).save();
+
+      await group.users().attach(firstUser);
+      await group.users().attach(secondUser);
+
+      const firstUserPost = await Post.forge(postHelper.buildPost(firstUser, group, 'First')).save();
+      const SecondUserPost = await Post.forge(postHelper.buildPost(secondUser, group, 'Second')).save();
+      const firstUserToken = await userHelper.getTokenForUser(firstUser, firstUserToSave.password);
+
+      // WHEN one user makes a GET request to /api/groups/:id/posts
+      const res = await chai.request(server)
+      .get(`/api/groups/${group.id}/posts`)
+      .set('Authorization', `Bearer ${firstUserToken}`)
+
+      // THEN the response should include both posts belonging to that group
+      res.should.have.status(200);
+      res.body.posts.should.be.an('array');
+      res.body.posts.length.should.equal(2);
+    }); // it should...
+
+  });
 
 }); // describe 'Groups'
