@@ -6,7 +6,6 @@ const server = require('../../app.js');
 const should = chai.should();
 
 const User = require('../../server/models/user');
-const GroupUser = require('../../server/models/group-user');
 const Group = require('../../server/models/group');
 const Post = require('../../server/models/post');
 
@@ -17,7 +16,6 @@ const postHelper = require('../helpers/post-helper');
 chai.use(chaiHttp);
 
 describe('Groups', () => {
-
   beforeEach(async () => {
     await userHelper.deleteAllUsers();
     await groupHelper.deleteAllGroups();
@@ -46,7 +44,7 @@ describe('Groups', () => {
     it('should retrieve one group when the user is a member of it', async () => {
       const userToSave = userHelper.buildUser();
       const user = await User.forge(userToSave).save();
-      const token = require('jwt-simple').encode(user.omit('password'), require('../../server/config/auth-config').jwtSecret);
+      const token = await userHelper.getTokenForUser(user, userToSave.password);
       const firstGroup = await Group.forge({ name: 'Connected group' }).save();
       const attachment = await firstGroup.users().attach(user);
       const secondGroup = await Group.forge({ name: 'Unrelated group' }).save();
@@ -86,7 +84,7 @@ describe('Groups', () => {
       // GIVEN two groups and a user as a member of ONE of them...
       const userToSave = userHelper.buildUser();
       const user = await User.forge(userToSave).save();
-      const token = require('jwt-simple').encode(user.omit('password'), require('../../server/config/auth-config').jwtSecret);
+      const token = await userHelper.getTokenForUser(user, userToSave.password);
       const firstGroup = await Group.forge({ name: 'Connected group' }).save();
       const attachment = await firstGroup.users().attach(user);
       const secondGroup = await Group.forge({ name: 'Unrelated group' }).save();
