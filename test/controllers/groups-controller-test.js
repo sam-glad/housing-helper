@@ -241,4 +241,52 @@ describe('Groups', () => {
     }); // it should...
   });
 
+  describe('POST /groups', () => {
+    it('should return 401 with no authenticated (via token) user', async () => {
+      try {
+        // GIVEN a valid request body
+        const groupToInsert = { name: 'This won\'t work' };
+
+        // WHEN the request is made to insert that group with no token provided
+        await chai.request(server)
+          .post('/api/groups/')
+          .send(groupToInsert);
+      } catch(res) {
+        // THEN the request should come back 401
+        res.should.have.status(401);
+      }
+    }); // it should...
+
+    it('should return 400 with an invalid payload', async () => {
+      // GIVEN a user making a request with an invalid payload
+      const userToSave = userHelper.buildUser();
+      const user = await User.forge(userToSave).save();
+      const token = await userHelper.getTokenForUser(user, userToSave.password);
+      const groupToInsert = { }; // name is required but not provided
+
+      // WHEN the request is made
+
+      // THEN it should come back 400
+    });
+
+    it('should insert a valid group', async () => {
+      // GIVEN a user making a request with valid body/headers
+      const userToSave = userHelper.buildUser();
+      const user = await User.forge(userToSave).save();
+      const token = await userHelper.getTokenForUser(user, userToSave.password);
+      const groupToInsert = { name: 'This won\'t work' };
+
+      // WHEN the request is made with a valid token
+      try {
+        await chai.request(server)
+          .post('/api/groups/')
+          .set('Authorization', `Bearer ${token}`)
+          .send(groupToInsert);
+      } catch(res) {
+        // THEN the request should come back 401
+        res.should.have.status(400);
+      }
+    }); // it should...
+  }); // describe 'POST /groups'
+
 }); // describe 'Groups'
