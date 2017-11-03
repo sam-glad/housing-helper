@@ -11,35 +11,37 @@ const groupHelper = require('../helpers/group-helper');
 chai.use(chaiHttp);
 
 describe('Auth', () => {
-    beforeEach(async () => {
-      await userHelper.deleteAllUsers();
-      await groupHelper.deleteAllGroups();
-    });
+  
+  beforeEach(async () => {
+    await userHelper.deleteAllUsers();
+    await groupHelper.deleteAllGroups();
+  });
+
   describe('POST /auth/register', () => {
-      it('should register a new user with valid credentials', (done) => {
-        const user = userHelper.buildUser();
-        chai.request(server)
-            .post('/api/auth/register')
-            .send(user)
-            .end((err, res) => {
-              res.should.have.status(200);
-              res.body.name_first.should.equal(user.name_first);
-              res.body.name_last.should.equal(user.name_last);
-              res.body.email_address.should.equal(user.email_address);
-              res.body.id.should.be.a('number');
-              done();
-            });
-      });
+    it('should register a new user with valid credentials', (done) => {
+      const user = userHelper.buildUser();
+      chai.request(server)
+        .post('/api/auth/register')
+        .send(user)
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.name_first.should.equal(user.name_first);
+          res.body.name_last.should.equal(user.name_last);
+          res.body.email_address.should.equal(user.email_address);
+          res.body.id.should.be.a('number');
+          done();
+        });
+    });
 
       it('should not register a new user with invalid credentials', (done) => {
         const invalidUser = {};
         chai.request(server)
-            .post('/api/auth/register')
-            .send(invalidUser)
-            .end((err, res) => {
-              res.should.have.status(400);
-              done();
-            });
+          .post('/api/auth/register')
+          .send(invalidUser)
+          .end((err, res) => {
+            res.should.have.status(400);
+            done();
+          });
       });
   });
 
