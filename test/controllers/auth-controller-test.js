@@ -1,14 +1,9 @@
-process.env.NODE_ENV = 'test';
-
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const server = require('../../app.js');
 const should = chai.should();
-const expect = chai.expect;
 
 const User = require('../../server/models/user');
-const GroupUser = require('../../server/models/group-user');
-const Group = require('../../server/models/group');
 
 const userHelper = require('../helpers/user-helper');
 const groupHelper = require('../helpers/group-helper');
@@ -28,10 +23,10 @@ describe('Auth', () => {
             .send(user)
             .end((err, res) => {
               res.should.have.status(200);
-              expect(res.body.name_first).to.equal(user.name_first);
-              expect(res.body.name_last).to.equal(user.name_last);
-              expect(res.body.email_address).to.equal(user.email_address);
-              expect(res.body.id).to.be.a('number');
+              res.body.name_first.should.equal(user.name_first);
+              res.body.name_last.should.equal(user.name_last);
+              res.body.email_address.should.equal(user.email_address);
+              res.body.id.should.be.a('number');
               done();
             });
       });
@@ -62,7 +57,7 @@ describe('Auth', () => {
         .send(body);
 
         res.should.have.status(200);
-        expect(res.body.token).to.be.a('string');
+        res.body.token.should.be.a('string');
     });
 
     it('should not return a token for a request with invalid credentials', async () => {
