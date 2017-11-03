@@ -1,3 +1,5 @@
+process.env.NODE_ENV = 'test';
+
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const server = require('../../app.js');
@@ -46,6 +48,43 @@ describe('Auth', () => {
   });
 
   describe('POST /auth/login', () => {
+    it('should not return a token for a request with invalid credentials', async () => {
+      const user = userHelper.buildUser()
+      await User.forge(user).save();      
+
+      const body = {
+        email_address: 'test@example.com',
+        password: 'WROOOONG!'
+      };
+
+      // try-catch due to superagent being a presumptious putz:
+      // https://github.com/chaijs/chai-http/issues/75
+      try {
+        const res = await chai.request(server)
+        .post('/api/auth/login')
+        .send(body);
+      } catch(res) {
+        res.should.have.status(401);
+      }
+    }); // it...
+
+    it('should not return a token for a request with credentials for a nonexistent user', async () => {
+      const body = {
+        email_address: 'test@example.com',
+        password: 'WROOOONG!'
+      };
+
+      // try-catch due to superagent being a presumptious putz:
+      // https://github.com/chaijs/chai-http/issues/75
+      try {
+        const res = await chai.request(server)
+        .post('/api/auth/login')
+        .send(body);
+      } catch(res) {
+        res.should.have.status(401);
+      }
+    }); // it...
+
     it('should allow an existing user with valid credentials to log in', async () => {
       const user = userHelper.buildUser()
       await User.forge(user).save();      
@@ -61,22 +100,5 @@ describe('Auth', () => {
         res.should.have.status(200);
         res.body.token.should.be.a('string');
     });
-
-    it('should not return a token for a request with invalid credentials', async () => {
-      const invalidUser = {
-        email_address: 'test@example.com',
-        password: 'WROOOONG!'
-      };
-
-      // try-catch due to superagent being a presumptious putz:
-      // https://github.com/chaijs/chai-http/issues/75
-      try {
-        const res = await chai.request(server)
-        .post('/api/auth/login')
-        .send(invalidUser);
-      } catch(res) {
-        res.should.have.status(401);
-      }
-    }); // it...
   });
 });
