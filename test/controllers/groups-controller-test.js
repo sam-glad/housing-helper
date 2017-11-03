@@ -24,23 +24,25 @@ describe('Groups', () => {
   });
 
   describe('GET api/groups/:id', () => {
-    it('should return 401 when no user is authenticated', (done) => {
-      chai.request(server)
-        .get('/api/groups/1')
-        .end((err, res) => {
-          res.should.have.status(401);
-          done();
-        });
+    it('should return 401 when no user is authenticated', async () => {
+      try {
+        await chai.request(server)
+        .get('/api/groups/1');
+      }
+      catch(res) {
+        res.should.have.status(401);
+      }
     }); // it should...
 
-    it('should return 401 when the token passed is not valid', (done) => {
-      chai.request(server)
+    it('should return 401 when the token passed is not valid', async () => {
+      try {
+        await chai.request(server)
         .get('/api/groups/1')
-        .set('Authorization', 'This is not a token :)')
-        .end((err, res) => {
-          res.should.have.status(401);
-          done();
-        });
+        .set('Authorization', 'This is not a token :)');
+      }
+      catch(res) {
+        res.should.have.status(401);
+      }
     }); // it should...
 
     it('should return 401 when the user is not a member of the group in question', async () => {
@@ -98,23 +100,25 @@ describe('Groups', () => {
   }); // describe 'GET /groups/:id
 
   describe('GET /api/groups/', () => {
-    it('should return 401 when no token is provided', (done) => {
-      chai.request(server)
-        .get('/api/groups/')
-        .end((err, res) => {
-          res.should.have.status(401);
-          done();
-        });
+    it('should return 401 when no token is provided', async () => {
+      try {
+        await chai.request(server)
+        .get('/api/groups/');
+      }
+      catch(res) {
+        res.should.have.status(401);
+      }
     }); // it should...
 
-    it('should return 401 when a bad token value is provided', (done) => {
-      chai.request(server)
+    it('should return 401 when a bad token value is provided', async () => {
+      try {
+        await chai.request(server)
         .get('/api/groups/')
-        .set('Authorization', 'This is not a token :)')
-        .end((err, res) => {
-          res.should.have.status(401);
-          done();
-        });
+        .set('Authorization', 'This is not a token :)');
+      }
+      catch(res) {
+        res.should.have.status(401);
+      }
     }); // it should...
 
     it('should retrieve all of an authenticated user\'s groups and no others', async () => {
