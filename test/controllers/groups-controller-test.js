@@ -262,9 +262,17 @@ describe('Groups', () => {
       const userToSave = userHelper.buildUser();
       const user = await User.forge(userToSave).save();
       const token = await userHelper.getTokenForUser(user, userToSave.password);
-      const groupToInsert = { }; // name is required but not provided
+      const emptyPayload = { }; // name is required but not provided
 
       // WHEN the request is made
+      try {
+        await chai.request(server)
+          .post('/api/groups')
+          .set('Authorization', `Bearer ${token}`)
+          .send(emptyPayload);
+      } catch(res) {
+        res.should.have.status(400);
+      }
 
       // THEN it should come back 400
     });

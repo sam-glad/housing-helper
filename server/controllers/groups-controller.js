@@ -15,7 +15,7 @@ router.get('/', passport.authenticate('jwt', { session: false }), async (req, re
   }
   catch(error) {
     console.log(error)
-    return res.status(400);
+    res.status(400).send();
   }
 });
 
@@ -34,7 +34,7 @@ router.get('/:id', passport.authenticate('jwt', { session: false }), async (req,
   }
   catch(error) {
     console.log(error)
-    return res.status(400);
+    return res.status(400).send();
   }
 });
 
@@ -55,7 +55,7 @@ router.get('/:id/posts', passport.authenticate('jwt', { session: false }), async
   }
   catch(error) {
     console.log(error)
-    res.status(400);
+    res.status(400).send();
   }
 });
 
@@ -73,7 +73,7 @@ router.get('/:id/users', passport.authenticate('jwt', { session: false }), async
   }
   catch(error) {
     console.log(error)
-    res.status(400);
+    res.status(400).send();
   }
 });
 
@@ -83,18 +83,14 @@ router.post('/', passport.authenticate('jwt', { session: false }), async (req, r
   try {
     let group = new Group();
 
-    const insertedGroup = await group.save({
-      name: req.body.name
-      // user_id: req.user.id
-    });
-
+    const insertedGroup = await Group.forge({ name: req.body.name }).save();
     const user = await User.where('id', req.user.id).fetch();
     await insertedGroup.users().attach(user);
     res.status(201).json(insertedGroup.toJSON());
   }
   catch(error) {
     console.log(error);
-    res.status(400);
+    res.status(400).send();
   }
 });
 
@@ -118,7 +114,7 @@ router.post('/', passport.authenticate('jwt', { session: false }), async (req, r
 //   }
 //   catch(error) {
 //     console.log(error)
-//     res.status(400);
+//     res.status(400).send();
 //   }
 // });
 
