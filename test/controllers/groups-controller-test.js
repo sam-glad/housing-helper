@@ -16,12 +16,14 @@ const postHelper = require('../helpers/post-helper');
 chai.use(chaiHttp);
 
 describe('Groups', () => {
+  const badGroupId = 'фу';
+
   beforeEach(async () => {
     await userHelper.deleteAllUsers();
     await groupHelper.deleteAllGroups();
   });
 
-  describe('GET /groups/:id', () => {
+  describe('GET api/groups/:id', () => {
     it('should return 401 when no user is authenticated', (done) => {
       chai.request(server)
         .get('/api/groups/1')
@@ -40,6 +42,41 @@ describe('Groups', () => {
           done();
         });
     }); // it should...
+
+    it('should return 401 when the user is not a member of the group in question', async () => {
+      // GIVEN a user who is a member of one group but is not a member of another...
+      const userToSave = userHelper.buildUser();
+      const user = await User.forge(userToSave).save();
+      const token = await userHelper.getTokenForUser(user, userToSave.password);
+
+      const firstGroup = await Group.forge({ name: 'Connected group' }).save();
+      const attachment = await firstGroup.users().attach(user);
+      const secondGroup = await Group.forge({ name: 'Unrelated group' }).save();
+
+      // WHEN that user tries to retrieve info for the group of which he is NOT a member...
+      try {
+        await chai.request(server)
+        .get(`/api/groups/${secondGroup.id}`)
+        .set('Authorization', `Bearer ${token}`);
+      } catch(res) {
+        // THEN the response should have a 401 status code
+        res.should.have.status(401);
+      }
+    });
+
+    it('should return 400 when passed an invalid group ID', async () => {
+      const userToSave = userHelper.buildUser();
+      const user = await User.forge(userToSave).save();
+      const token = await userHelper.getTokenForUser(user, userToSave.password);
+
+      try {
+        await chai.request(server)
+        .get(`/api/groups/${badGroupId}`)
+        .set('Authorization', `Bearer ${token}`);
+      } catch(res) {
+        res.should.have.status(400);
+      }
+    });
 
     it('should retrieve one group when the user is a member of it', async () => {
       const userToSave = userHelper.buildUser();
@@ -60,7 +97,7 @@ describe('Groups', () => {
 
   }); // describe 'GET /groups/:id
 
-  describe('GET /groups/', () => {
+  describe('GET /api/groups/', () => {
     it('should return 401 when no token is provided', (done) => {
       chai.request(server)
         .get('/api/groups/')
@@ -144,6 +181,20 @@ describe('Groups', () => {
       }
     }); // it should...
 
+    it('should return 400 when passed an invalid group ID', async () => {
+      const userToSave = userHelper.buildUser();
+      const user = await User.forge(userToSave).save();
+      const token = await userHelper.getTokenForUser(user, userToSave.password);
+
+      try {
+        await chai.request(server)
+        .get(`/api/groups/${badGroupId}/posts`)
+        .set('Authorization', `Bearer ${token}`);
+      } catch(res) {
+        res.should.have.status(400);
+      }
+    }); // it should...
+
     it('should return the group\'s posts when a user connected to the group is authenticated', async () => {
       // GIVEN a post belonging to a user belonging to a group
       // and a post belonging to a different user in that same group
@@ -210,6 +261,20 @@ describe('Groups', () => {
       } catch(res) {
         // THEN the request should return 401
         res.should.have.status(401);
+      }
+    }); // it should...
+
+    it('should return 400 when passed an invalid group ID', async () => {
+      const userToSave = userHelper.buildUser();
+      const user = await User.forge(userToSave).save();
+      const token = await userHelper.getTokenForUser(user, userToSave.password);
+
+      try {
+        await chai.request(server)
+        .get(`/api/groups/${badGroupId}/users`)
+        .set('Authorization', `Bearer ${token}`);
+      } catch(res) {
+        res.should.have.status(400);
       }
     }); // it should...
 
