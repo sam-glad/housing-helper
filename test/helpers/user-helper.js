@@ -1,13 +1,14 @@
+const bookshelf = require('../../db/bookshelf');
+
 const jwt = require('jwt-simple');
-const Promise = require('bluebird');
 
 const User = require('../../server/models/user');
 const authConfig = require('../../server/config/auth-config');
 
 function buildUser(sequence) {
   const user = {
-                 name_first: 'First name',
-                 name_last: 'Last name',
+                 name_first: 'FirstName',
+                 name_last: 'LastName',
                  name_full: 'First name Last name', // TODO: Automate this... good lord
                  email_address: 'test@example.com',
                  password: 'pass'
@@ -15,11 +16,32 @@ function buildUser(sequence) {
   if (sequence || sequence === 0) {
     Object.keys(user).forEach((key) => {
       if (typeof(user[key]) === 'string') {
-        user[key] += ` ${sequence}`;
+        key === 'email_address' ? user[key] = user[key].split('@').join(`${sequence}@`) : user[key] += ` ${sequence}`;
       }
     });
   }
   return user;
+}
+
+function buildUsers(numberOfUsers) {
+  let usersToSave = [];
+  for(let i = 1;i <= numberOfUsers;i++) {
+    usersToSave.push(buildUser(i));
+  };
+  return usersToSave;
+}
+
+// Ugh
+async function insertTwoUsers(firstUserToSave, secondUserToSave) {
+  return await bookshelf.transaction(async () => {
+    let users = [];
+    console.log(`FIRST USER TO SAVE: ${JSON.stringify(firstUserToSave)}`);
+    const firstUser = await User.forge(firstUserToSave).save();
+    users.push(firstUser);
+    const secondUser = await User.forge(secondUserToSave).save();
+    users.push(secondUser);
+    return [firstUser, secondUser];
+  });
 }
 
 async function deleteAllUsers() {
@@ -42,6 +64,8 @@ async function getTokenForUser(user, password) {
 
 module.exports = {
   buildUser,
+  buildUsers,
+  insertTwoUsers,
   deleteAllUsers,
   getTokenForUser
 };

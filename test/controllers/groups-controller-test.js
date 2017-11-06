@@ -1,3 +1,5 @@
+'use strict'
+
 process.env.NODE_ENV = 'test';
 
 const chai = require('chai');
@@ -7,7 +9,6 @@ const should = chai.should();
 
 const User = require('../../server/models/user');
 const Group = require('../../server/models/group');
-process.env.NODE_ENV = 'test';
 
 const Post = require('../../server/models/post');
 
