@@ -10,7 +10,6 @@ const should = chai.should();
 const User = require('../../server/models/user');
 
 const userHelper = require('../helpers/user-helper');
-const bookshelf = require('../../db/bookshelf');
 
 chai.use(chaiHttp);
 

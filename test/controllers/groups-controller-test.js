@@ -23,7 +23,6 @@ describe('Groups', () => {
 
   beforeEach(async () => {
     await userHelper.deleteAllUsers();
-    await groupHelper.deleteAllGroups();
   });
 
   describe('GET api/groups/:id', () => {
