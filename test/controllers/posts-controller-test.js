@@ -47,16 +47,17 @@ describe('/api/posts/', () => {
       const secondUser = await User.forge(userHelper.buildUser(2)).save();
       const firstUserToken = await userHelper.getTokenForUser(firstUser, firstUserToSave.password);
 
-      // const groups = await bookshelf.transaction(async () => {
-        const firstGroup = await Group.forge({ name: "User's Group" }).save();
-        await firstGroup.users().attach(firstUser);
-        const separateGroup = await Group.forge({ name: 'Other Group' }).save();
+      let firstGroup, firstPost;
+      const groups = await bookshelf.transaction(async (trx) => {
+        firstGroup = await Group.forge({ name: "User's Group" }).save(null, { transacting: trx });
+        await firstGroup.users().attach(firstUser, { transacting: trx });
+        const separateGroup = await Group.forge({ name: 'Other Group' }).save(null, { transacting: trx });
         const firstPostToSave = postHelper.buildPost(firstUser.id, firstGroup.id, "User's First Post");
-        const firstPost = await Post.forge(firstPostToSave).save();
+        firstPost = await Post.forge(firstPostToSave).save(null, { transacting: trx });
         const separatePostToSave = postHelper.buildPost(secondUser.id, separateGroup.id, "Some other group's/user's post");
-        const separatePost = await Post.forge(separatePostToSave).save();
-      //   return { firstGroup: firstGroup, separateGroup: separateGroup };
-      // });
+        const separatePost = await Post.forge(separatePostToSave).save(null, { transacting: trx });
+        return { firstGroup: firstGroup, separateGroup: separateGroup };
+      });
 
       // WHEN the user requests his posts...
       const res = await chai.request(server)
