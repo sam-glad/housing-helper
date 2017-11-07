@@ -2,6 +2,7 @@
 
 process.env.NODE_ENV = 'test';
 
+const bookshelf = require('../../db/bookshelf');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const server = require('../../app.js');
@@ -50,12 +51,14 @@ describe('Groups', () => {
     it('should return 401 when the user is not a member of the group in question', async () => {
       // GIVEN a user who is a member of one group but is not a member of another...
       const userToSave = userHelper.buildUser();
-      const user = await User.forge(userToSave).save();
+      let user, firstGroup, secondGroup;
+      await bookshelf.transaction(async (trx) => {
+        user = await User.forge(userToSave).save();
+        firstGroup = await Group.forge({ name: 'Connected group' }).save();
+        await firstGroup.users().attach(user, { transacting: trx });
+        secondGroup = await Group.forge({ name: 'Unrelated group' }).save();
+      });
       const token = await userHelper.getTokenForUser(user, userToSave.password);
-
-      const firstGroup = await Group.forge({ name: 'Connected group' }).save();
-      const attachment = await firstGroup.users().attach(user);
-      const secondGroup = await Group.forge({ name: 'Unrelated group' }).save();
 
       // WHEN that user tries to retrieve info for the group of which he is NOT a member...
       try {
@@ -84,11 +87,14 @@ describe('Groups', () => {
 
     it('should retrieve one group when the user is a member of it', async () => {
       const userToSave = userHelper.buildUser();
-      const user = await User.forge(userToSave).save();
-      const token = await userHelper.getTokenForUser(user, userToSave.password);
-      const firstGroup = await Group.forge({ name: 'Connected group' }).save();
-      const attachment = await firstGroup.users().attach(user);
-      const secondGroup = await Group.forge({ name: 'Unrelated group' }).save();
+      let user, firstGroup;
+      await bookshelf.transaction(async (trx) => {
+        user = await User.forge(userToSave).save(null, { transacting: trx });  
+        firstGroup = await Group.forge({ name: 'Connected group' }).save(null, { transacting: trx });
+        await firstGroup.users().attach(user, { transacting: trx });
+        const secondGroup = await Group.forge({ name: 'Unrelated group' }).save(null, { transacting: trx });
+      });
+      const token = await userHelper.getTokenForUser(user, userToSave.password);  
 
       const response = await chai.request(server)
         .get(`/api/groups/${firstGroup.id}`)
@@ -126,11 +132,15 @@ describe('Groups', () => {
     it('should retrieve all of an authenticated user\'s groups and no others', async () => {
       // GIVEN two groups and a user as a member of ONE of them...
       const userToSave = userHelper.buildUser();
-      const user = await User.forge(userToSave).save();
+      let user, firstGroup;
+      await bookshelf.transaction(async (trx) => {
+        user = await User.forge(userToSave).save(null, { transacting: trx });;
+        firstGroup = await Group.forge({ name: 'Connected group' }).save(null, { transacting: trx });
+        await firstGroup.users().attach(user, { transacting: trx });
+        const secondGroup = await Group.forge({ name: 'Unrelated group' }).save(null, { transacting: trx });
+      });
+
       const token = await userHelper.getTokenForUser(user, userToSave.password);
-      const firstGroup = await Group.forge({ name: 'Connected group' }).save();
-      const attachment = await firstGroup.users().attach(user);
-      const secondGroup = await Group.forge({ name: 'Unrelated group' }).save();
 
       // WHEN that user requests his groups
       const res = await chai.request(server)
@@ -155,8 +165,6 @@ describe('Groups', () => {
       // WHEN a tokenless request is made to see its posts...
 
       // THEN the request should return 401
-      // try-catch due to superagent being a presumptious putz:
-      // https://github.com/chaijs/chai-http/issues/75
       try {
         const res = await chai.request(server)
         .get(`/api/groups/${group.id}/posts`)
@@ -167,16 +175,16 @@ describe('Groups', () => {
 
     it('should return 401 when a user unconnected to the group is authenticated', async () => {
       // GIVEN a group...
-      const group = await Group.forge({ name: 'One group' }).save();
+      let group, user;
       const userToSave = userHelper.buildUser();
-      const user = await User.forge(userToSave).save();
+      await bookshelf.transaction(async (trx) => {
+        group = await Group.forge({ name: 'One group' }).save();
+        user = await User.forge(userToSave).save();
+      });
       const token = await userHelper.getTokenForUser(user, userToSave.password);
 
       // WHEN a request is made to see the group's posts,
       // but the authenticated user is not in that group...
-
-      // try-catch due to superagent being a presumptious putz:
-      // https://github.com/chaijs/chai-http/issues/75
       try {
         const res = await chai.request(server)
         .get(`/api/groups/${group.id}/posts`)
@@ -204,17 +212,22 @@ describe('Groups', () => {
     it('should return the group\'s posts when a user connected to the group is authenticated', async () => {
       // GIVEN a post belonging to a user belonging to a group
       // and a post belonging to a different user in that same group
-      const group = await Group.forge({ name: 'One group' }).save();
       const firstUserToSave = userHelper.buildUser('First');
-      const firstUser = await User.forge(firstUserToSave).save();
       const secondUserToSave = userHelper.buildUser('Second');
-      const secondUser = await User.forge(secondUserToSave).save();
+      let group, firstUser;
+      await bookshelf.transaction(async (trx) => {
+        group = await Group.forge({ name: 'One group' }).save(null, { transacting: trx });
+        firstUser = await User.forge(firstUserToSave).save(null, { transacting: trx });
+        const secondUser = await User.forge(secondUserToSave).save(null, { transacting: trx });
 
-      await group.users().attach(firstUser);
-      await group.users().attach(secondUser);
+        await group.users().attach(firstUser, { transacting: trx });
+        await group.users().attach(secondUser, { transacting: trx });
 
-      const firstUserPost = await Post.forge(postHelper.buildPost(firstUser.id, group.id, 'First')).save();
-      const SecondUserPost = await Post.forge(postHelper.buildPost(secondUser.id, group.id, 'Second')).save();
+        const firstUserPost = await Post.forge(postHelper.buildPost(firstUser.id, group.id, 'First')).save(null, { transacting: trx });
+        const SecondUserPost = await Post.forge(postHelper.buildPost(secondUser.id, group.id, 'Second')).save(null, { transacting: trx });
+        return;
+      });
+
       const firstUserToken = await userHelper.getTokenForUser(firstUser, firstUserToSave.password);
 
       // WHEN one user makes a request to get the group's posts
@@ -236,9 +249,6 @@ describe('Groups', () => {
       const group = await Group.forge({ name: 'One group' }).save();
 
       // WHEN a tokenless request is made to see its posts...
-
-      // try-catch due to superagent being a presumptious putz:
-      // https://github.com/chaijs/chai-http/issues/75
       try {
         const res = await chai.request(server)
         .get(`/api/groups/${group.id}/users`)
@@ -340,10 +350,9 @@ describe('Groups', () => {
           .set('Authorization', `Bearer ${token}`)
           .send(emptyPayload);
       } catch(res) {
+        // THEN it should get a 400 response
         res.should.have.status(400);
       }
-
-      // THEN it should come back 400
     });
 
     it('should insert a valid group', async () => {
