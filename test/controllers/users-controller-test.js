@@ -2,6 +2,7 @@
 
 process.env.NODE_ENV = 'test';
 
+const bookshelf = require('../../db/bookshelf');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const server = require('../../app.js');
@@ -73,7 +74,6 @@ describe('/api/users', () => {
     it('should retrieve users with names resembling the value of the "name" query param', async () => {
       // GIVEN two users with similar names and one with a different name...
       const similarUsersToSave = userHelper.buildUsers(2);
-      const similarUsers = await userHelper.insertTwoUsers(similarUsersToSave[0], similarUsersToSave[1]);
       const differentUserToSave = {
         name_first: 'Foo',
         name_last: 'Bar',
@@ -82,7 +82,12 @@ describe('/api/users', () => {
         email_address: 'foo@bar.com',
         password: 'test'
       };
-      const differentUser = await User.forge(differentUserToSave).save();
+
+      let similarUsers, differentUser;
+      await bookshelf.transaction(async (trx) => {
+        similarUsers = await userHelper.insertTwoUsers(similarUsersToSave[0], similarUsersToSave[1]);
+        differentUser = await User.forge(differentUserToSave).save();
+      });
 
       // WHEN the different user queries for users with names containing "FirstName"
       const token = await userHelper.getTokenForUser(differentUser, differentUserToSave.password);
