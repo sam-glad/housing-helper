@@ -213,8 +213,8 @@ describe('Groups', () => {
       await group.users().attach(firstUser);
       await group.users().attach(secondUser);
 
-      const firstUserPost = await Post.forge(postHelper.buildPost(firstUser, group, 'First')).save();
-      const SecondUserPost = await Post.forge(postHelper.buildPost(secondUser, group, 'Second')).save();
+      const firstUserPost = await Post.forge(postHelper.buildPost(firstUser.id, group.id, 'First')).save();
+      const SecondUserPost = await Post.forge(postHelper.buildPost(secondUser.id, group.id, 'Second')).save();
       const firstUserToken = await userHelper.getTokenForUser(firstUser, firstUserToSave.password);
 
       // WHEN one user makes a request to get the group's posts

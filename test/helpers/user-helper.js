@@ -35,7 +35,6 @@ function buildUsers(numberOfUsers) {
 async function insertTwoUsers(firstUserToSave, secondUserToSave) {
   return await bookshelf.transaction(async () => {
     let users = [];
-    console.log(`FIRST USER TO SAVE: ${JSON.stringify(firstUserToSave)}`);
     const firstUser = await User.forge(firstUserToSave).save();
     users.push(firstUser);
     const secondUser = await User.forge(secondUserToSave).save();

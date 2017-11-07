@@ -1,6 +1,6 @@
 'use strict';
 
-function buildPost(user, group, sequence) {
+function buildPost(userId, groupId, sequence) {
   const post = {
     title: 'Post',
     price: 10,
@@ -11,8 +11,8 @@ function buildPost(user, group, sequence) {
     parking: 'garage',
     housing_type: 'house',
     url: 'https://example.com/',
-    user_id: user.id,
-    group_id: group.id
+    user_id: userId,
+    group_id: groupId
   }
 
   if (sequence || sequence === 0) {

@@ -22,9 +22,9 @@ router.get('/search', passport.authenticate('jwt', { session: false }), async (r
       users = await User.query((qb) => {
         qb.select('id', 'name_first', 'name_last', 'name_full')
           .where(
-          // See "add-lower-name-full-index-to-users" migration,
-          // inspired by: https://stackoverflow.com/questions/1566717/postgresql-like-query-performance-variations
-          knex.raw('LOWER("name_full") LIKE ?', `%${nameForQuery}%`)
+            // See "add-lower-name-full-index-to-users" migration,
+            // inspired by: https://stackoverflow.com/questions/1566717/postgresql-like-query-performance-variations
+            knex.raw('LOWER("name_full") LIKE ?', `%${nameForQuery}%`)
         );
       }).fetchAll();
     }
