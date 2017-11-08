@@ -263,7 +263,6 @@ describe('Groups', () => {
       .set('Authorization', `Bearer ${setup.firstUserToken}`)
 
       // THEN the response should include both posts belonging to that group
-      console.log(JSON.stringify(res.body));
       res.should.have.status(200);
       res.body.id.should.eql(setup.firstGroup.id);
       res.body.name.should.eql(setup.firstGroup.attributes.name);

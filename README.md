@@ -1,7 +1,4 @@
-<div align="center">
-[![Build Status](https://travis-ci.org/sam-glad/housing-helper.svg?branch=master)](https://travis-ci.org/sam-glad/housing-helper)
-[![Coverage Status](https://coveralls.io/repos/github/sam-glad/housing-helper/badge.svg?branch=master)](https://coveralls.io/github/sam-glad/housing-helper?branch=master)
-</div>
+[![Build Status](https://travis-ci.org/sam-glad/housing-helper.svg?branch=master)](https://travis-ci.org/sam-glad/housing-helper) [![Maintainability](https://api.codeclimate.com/v1/badges/7e32fe97a838f5ab80c6/maintainability)](https://codeclimate.com/github/sam-glad/housing-helper/maintainability) [![Coverage Status](https://coveralls.io/repos/sam-glad/housing-helper/badge.png)](https://coveralls.io/r/sam-glad/housing-helper)
 
 ## NOTE
 
