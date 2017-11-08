@@ -22,7 +22,7 @@ router.get('/', passport.authenticate('jwt', { session: false }), async (req, re
   }
   catch(error) {
     console.log(error)
-    res.status(400);
+    res.status(400).send();
   }
 });
 
@@ -36,7 +36,7 @@ router.get('/:id', passport.authenticate('jwt', { session: false }), async (req,
   }
   catch(error) {
     console.log(error);
-    return res.status(400);
+    return res.status(400).send();
   }
 });
 
@@ -69,7 +69,7 @@ router.post('/', passport.authenticate('jwt', { session: false }), async (req, r
   }
   catch(error) {
     console.log(error);
-    res.status(400);
+    res.status(400).send();
   }
 });
 
