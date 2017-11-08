@@ -16,7 +16,6 @@ describe('Auth', () => {
 
   beforeEach(async () => {
     await userHelper.deleteAllUsers();
-    await groupHelper.deleteAllGroups();
   });
 
   describe('POST /auth/register', () => {
