@@ -360,18 +360,17 @@ describe('Groups', () => {
       const userToSave = userHelper.buildUser();
       const user = await User.forge(userToSave).save();
       const token = await userHelper.getTokenForUser(user, userToSave.password);
-      const groupToInsert = { name: 'This won\'t work' };
+      const groupToInsert = { name: 'This should work' };
 
       // WHEN the request is made with a valid token
-      try {
-        await chai.request(server)
-          .post('/api/groups/')
-          .set('Authorization', `Bearer ${token}`)
-          .send(groupToInsert);
-      } catch(res) {
-        // THEN the request should come back 401
-        res.should.have.status(400);
-      }
+      const res = await chai.request(server)
+        .post('/api/groups/')
+        .set('Authorization', `Bearer ${token}`)
+        .send(groupToInsert);
+
+      // THEN the request should successfully insert the group
+      res.should.have.status(201);
+      res.body.name.should.eql(groupToInsert.name);
     }); // it should...
   }); // describe 'POST /groups'
 
