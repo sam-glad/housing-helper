@@ -20,7 +20,7 @@ router.get('/:id', passport.authenticate('jwt', { session: false }), controllerH
   const groupWithUsers = await group.retrieveWithUsers(req.params.id);
 
   if (!group.hasUser(groupWithUsers, req.user.id)) {
-    return res.status(401).send('Unauthorized');
+    return res.status(401).send({ message: 'Unauthorized' });
   }
 
   // We only needed the users for the check above, so we just return the group

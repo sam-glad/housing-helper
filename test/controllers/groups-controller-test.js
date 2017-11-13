@@ -20,7 +20,6 @@ const postHelper = require('../helpers/post-helper');
 chai.use(chaiHttp);
 
 describe('Groups', () => {
-  const badGroupId = 'фу';
 
   beforeEach(async () => {
     await userHelper.deleteAllUsers();
@@ -50,15 +49,14 @@ describe('Groups', () => {
 
     it('should return 401 when the user is not a member of the group in question', async () => {
       // GIVEN a user who is a member of one group but is not a member of another...
-      const setupIncludeSecondGroup = true;
+      const includeSecondGroup = true;
       const includePosts = false;
-      const setup = await fullSetup(setupIncludeSecondGroup, includePosts);
-
+      const setup = await fullSetup(includeSecondGroup, includePosts);
       // WHEN that user tries to retrieve info for the group of which he is NOT a member...
       try {
         await chai.request(server)
-        .get(`/api/groups/${setup.secondGroup.id}`)
-        .set('Authorization', `Bearer ${setup.token}`);
+          .get(`/api/groups/${setup.secondGroup.id}`)
+          .set('Authorization', `Bearer ${setup.firstUserToken}`);
       } catch(res) {
         // THEN the response should have a 401 status code
         res.should.have.status(401);
@@ -299,13 +297,13 @@ async function fullSetup(includeSecondGroup, includePosts) {
     await firstGroup.users().attach(firstUser, { transacting: trx });
     await firstGroup.users().attach(secondUser, { transacting: trx });
     
+    if (includeSecondGroup) {
+      secondGroup = await Group.forge({ name: 'Second Group' }).save(null, { transacting: trx });
+    }
+
     if (includePosts) {
       firstUserFirstGroupPost = await Post.forge(postHelper.buildPost(firstUser.id, firstGroup.id, 'First')).save(null, { transacting: trx });
       secondUserFirstGroupPost = await Post.forge(postHelper.buildPost(secondUser.id, firstGroup.id, 'Second')).save(null, { transacting: trx });
-    }
-
-    if (includeSecondGroup) {
-      secondGroup = await Group.forge({ name: 'Second Group' }).save(null, { transacting: trx });
     }
   });
   const firstUserToken = await userHelper.getTokenForUser(firstUser, firstUserToSave.password);

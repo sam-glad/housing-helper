@@ -30,7 +30,13 @@ async function retrieveWithPosts(groupId, includeUsers) {
 }
 
 function hasUser(groupWithUsers, authenticatedUserId) {
-  return groupWithUsers.related('users').filter(user => user.id === authenticatedUserId).length === 1;
+  if (!groupWithUsers.related('users') || groupWithUsers.related('users').length === 0) {
+    return false;
+  }
+
+  return groupWithUsers.related('users').filter((user) => {
+    return user.id === authenticatedUserId.length === 1;
+  });
 }
 
 const Group = Bookshelf.Model.extend({
