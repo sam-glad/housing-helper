@@ -65,21 +65,6 @@ describe('Groups', () => {
       }
     }); // it should...
 
-    it('should return 400 when passed an invalid group ID', async () => {
-      // GIVEN a request with a valid token but invalid group ID URL param
-      const setup = await oneUserOneGroupSetup();
-
-      try {
-        // WHEN the request is made
-        await chai.request(server)
-        .get(`/api/groups/${badGroupId}`)
-        .set('Authorization', `Bearer ${setup.token}`);
-      } catch(res) {
-        // THEN the response should have a 400 status code
-        res.should.have.status(400);
-      }
-    }); // it should...
-
     it('should retrieve one group when the user is a member of it', async () => {
       // GIVEN a group and an attached user...
       const includeGroup = true;
@@ -173,18 +158,6 @@ describe('Groups', () => {
       }
     }); // it should...
 
-    it('should return 400 when passed an invalid group ID', async () => {
-      const setup = await oneUserOneGroupSetup();
-
-      try {
-        await chai.request(server)
-        .get(`/api/groups/${badGroupId}/posts`)
-        .set('Authorization', `Bearer ${setup.token}`);
-      } catch(res) {
-        res.should.have.status(400);
-      }
-    }); // it should...
-
     it('should return the group\'s posts when a user connected to the group is authenticated', async () => {
       // GIVEN a post belonging to a user belonging to a group
       // and a post belonging to a different user in that same group
@@ -235,18 +208,6 @@ describe('Groups', () => {
       } catch(res) {
         // THEN the request should return 401
         res.should.have.status(401);
-      }
-    }); // it should...
-
-    it('should return 400 when passed an invalid group ID', async () => {
-      const setup = await oneUserOneGroupSetup();
-
-      try {
-        await chai.request(server)
-        .get(`/api/groups/${badGroupId}/users`)
-        .set('Authorization', `Bearer ${setup.token}`);
-      } catch(res) {
-        res.should.have.status(400);
       }
     }); // it should...
 

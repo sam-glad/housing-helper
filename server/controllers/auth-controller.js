@@ -30,6 +30,7 @@ router.post('/register', controllerHelper.wrapAsync(async function(req, res) {
     password: req.body.password
   };
 
+  // TODO: Model validation + middleware to handle this (stop being a meathead re: separation of concerns)
   Object.keys(userFromRequest).forEach((key) => {
     if (!userFromRequest[key]) {
       return res.status(400).json({ message: 'Ensure that email_address, name_first, name_last, name_full, and password all have values' });
