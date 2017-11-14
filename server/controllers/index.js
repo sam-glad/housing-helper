@@ -13,8 +13,4 @@ router.use('/api/posts', postsController);
 router.use('/api/groups', groupsController);
 router.use('/api/groups-users', groupsUsersController);
 
-router.get('/', function(req, res) {
-  res.send('Home page');
-})
-
 module.exports = router;
