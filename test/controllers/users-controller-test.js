@@ -77,8 +77,6 @@ describe('/api/users', () => {
       const differentUserToSave = {
         name_first: 'Foo',
         name_last: 'Bar',
-        // TODO god damn just automate this
-        name_full: 'Foo Bar',
         email_address: 'foo@bar.com',
         password: 'test'
       };

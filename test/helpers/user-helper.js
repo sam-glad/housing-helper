@@ -9,7 +9,6 @@ function buildUser(sequence) {
   const user = {
                  name_first: 'FirstName',
                  name_last: 'LastName',
-                 name_full: 'First name Last name', // TODO: Automate this... good lord
                  email_address: 'test@example.com',
                  password: 'pass'
                };

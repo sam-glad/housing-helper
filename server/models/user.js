@@ -19,6 +19,8 @@ function initialize() {
       const salt = yield promisifiedBcrypt.genSaltAsync(authConfig.saltRounds);
       const hashedPassword = yield promisifiedBcrypt.hashAsync(model.attributes.password, salt);
       model.set('password', hashedPassword);
+
+      model.set('name_full', `${model.attributes.name_first} ${model.attributes.name_last}`);
     })();
   });
 }
