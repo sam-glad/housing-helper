@@ -41,7 +41,7 @@ router.post('/register', controllerHelper.wrapAsync(async function(req, res) {
   const soloGroup = await Group.forge({ name: 'Just Me', is_just_me: true }).save();
   const retrievedGroup = await Group.where({ id: soloGroup.id }).fetch();
   retrievedGroup.users().attach(user.id);
-  res.json(user.omit('password'));
+  res.status(201).json(user.omit('password'));
 }));
 
 module.exports = router;

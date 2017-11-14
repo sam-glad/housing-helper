@@ -26,9 +26,10 @@ describe('Auth', () => {
         .post('/api/auth/register')
         .send(user);
       } catch(res) {
-        res.should.have.status(200);
+        res.should.have.status(201);
         res.body.name_first.should.equal(user.name_first);
         res.body.name_last.should.equal(user.name_last);
+        res.body.name_full.should.equal(`${user.name_first} ${user.name_last}`);
         res.body.email_address.should.equal(user.email_address);
         res.body.id.should.be.a('number');
       }
