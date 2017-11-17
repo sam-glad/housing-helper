@@ -15,9 +15,9 @@ curl -X POST \
   https://housinghelper.herokuapp.com/api/auth/register \
   -H 'content-type: application/json' \
   -d '{
-  "name_first":"Test",
-  "name_last":"Test",
-  "email_address":"foo@example.com",
+  "name_first":"First",
+  "name_last":"Last",
+  "email_address":"developer@example.com",
   "password":"test"
 }'
 ```
