@@ -6,7 +6,6 @@ const controllerHelper = require('./controller-helper');
 const jwt = require('jwt-simple');
 const authConfig = require('../config/auth-config');
 const User = require('../models/user');
-const Group = require('../models/group');
 
 router.post('/login', controllerHelper.wrapAsync(async function(req, res) {
   const user = await User.where('email_address', req.body.email_address).fetch();
@@ -37,10 +36,6 @@ router.post('/register', controllerHelper.wrapAsync(async function(req, res) {
   });
 
   const user = await User.forge(userFromRequest).save();
-  // Add user's default group
-  const soloGroup = await Group.forge({ name: 'Just Me', is_just_me: true }).save();
-  const retrievedGroup = await Group.where({ id: soloGroup.id }).fetch();
-  retrievedGroup.users().attach(user.id);
   res.status(201).json(user.omit('password'));
 }));
 

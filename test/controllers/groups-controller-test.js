@@ -118,9 +118,10 @@ describe('Groups', () => {
       // THEN he should successfully retrieve ONLY his own group
       res.should.have.status(200);
       res.body.should.be.an('array');
-      res.body.length.should.equal(1);
-      res.body[0].id.should.equal(setup.firstGroup.id);
-      res.body[0].name.should.equal(setup.firstGroup.attributes.name);
+      const notJustMeGroups = res.body.filter((group) => { return group.is_just_me === false });
+      notJustMeGroups.length.should.equal(1);
+      notJustMeGroups[0].id.should.equal(setup.firstGroup.id);
+      notJustMeGroups[0].name.should.equal(setup.firstGroup.attributes.name);
     }); // it should...
 
   }); // describe GET /groups/

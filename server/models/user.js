@@ -9,6 +9,8 @@ const jwt = require('jwt-simple');
 const authConfig = require('../config/auth-config');
 require('./post');
 require('./group');
+const Group = require('./group');
+const GroupUser = require('./group-user');
 require('./group-user');
 
 function initialize() {
@@ -22,6 +24,13 @@ function initialize() {
 
       model.set('name_full', `${model.attributes.name_first} ${model.attributes.name_last}`);
     })();
+  });
+
+  this.on('created', async (model, resp, options) => {
+    // TODO: Transaction here?
+    const soloGroup = await Group.forge({ name: 'Just Me', is_just_me: true }).save();
+    const attachmentToSave = { user_id: this.get('id'), group_id: soloGroup.id };
+    const attachment = await GroupUser.forge(attachmentToSave).save(null, { transacting: options.transacting });
   });
 }
 

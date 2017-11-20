@@ -65,13 +65,13 @@ describe('/api/posts/', () => {
 
       // THEN the the user should get only the posts from his own groups
       res.should.have.status(200);
-      const numberOfGroupsForUser = 1; // Just "User's Group"
+      const numberOfGroupsForUser = 2; // "Just Me" group plus "User's Group"
       const numberOfPostsForUser = 1; // Just the one post for "User's Group"
-      res.body.length.should.eql(numberOfGroupsForUser); // User is a mem
-      res.body[0].id.should.eql(firstGroup.id);
-      res.body[0].posts.should.be.an('array');
-      res.body[0].posts.length.should.eql(numberOfPostsForUser);
-      res.body[0].posts[0].id.should.eql(firstPost.id);
+      res.body.length.should.eql(numberOfGroupsForUser);
+      const notJustMeGroups = res.body.filter((group) => { return group.is_just_me === false });
+      notJustMeGroups.length.should.equal(1);
+      notJustMeGroups[0].posts.length.should.eql(numberOfPostsForUser);
+      notJustMeGroups[0].posts[0].id.should.eql(firstPost.id);
     }); // it should....
   }); // describe GET /api/posts/
 
