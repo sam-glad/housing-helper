@@ -46,7 +46,6 @@ describe('/api/users', () => {
         .get('/api/users/search')
         .set('Authorization', `Bearer ${token}`);
       } catch({ response }) {
-        console.log(response);
         // THEN it should get a 400 response with the appropriate message
         response.should.have.status(400);
         response.text.should.equal('Neither email address nor name provided');

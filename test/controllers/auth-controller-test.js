@@ -42,7 +42,6 @@ describe('Auth', () => {
         .post('/api/auth/register')
         .send(invalidUser);
       } catch(res) {
-        console.log(JSON.stringify(res));
           res.should.have.status(400);
         }
     });
