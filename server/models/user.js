@@ -3,7 +3,6 @@
 const bookshelf = require('../../db/bookshelf');
 const Promise = require('bluebird');
 const bcrypt = require('bcrypt');
-const promisifiedBcrypt = Promise.promisifyAll(require('bcrypt'));
 const jwt = require('jwt-simple');
 
 const authConfig = require('../config/auth-config');
@@ -14,16 +13,13 @@ const GroupUser = require('./group-user');
 require('./group-user');
 
 function initialize() {
-  this.on('saving', model => {
+  this.on('saving', async (model) => {
     if (!model.hasChanged('password')) return;
 
-    return Promise.coroutine(function* () {
-      const salt = yield promisifiedBcrypt.genSaltAsync(authConfig.saltRounds);
-      const hashedPassword = yield promisifiedBcrypt.hashAsync(model.attributes.password, salt);
-      model.set('password', hashedPassword);
-
-      model.set('name_full', `${model.attributes.name_first} ${model.attributes.name_last}`);
-    })();
+    const salt = await bcrypt.genSalt(authConfig.saltRounds);
+    const hashedPassword = await bcrypt.hash(model.attributes.password, salt);
+    model.set('password', hashedPassword);
+    model.set('name_full', `${model.attributes.name_first} ${model.attributes.name_last}`);
   });
 
   this.on('created', async (model, resp, options) => {
