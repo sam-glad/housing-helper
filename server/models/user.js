@@ -1,7 +1,6 @@
 'use strict';
 
 const bookshelf = require('../../db/bookshelf');
-const Promise = require('bluebird');
 const bcrypt = require('bcrypt');
 const jwt = require('jwt-simple');
 
