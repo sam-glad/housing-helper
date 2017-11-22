@@ -51,6 +51,7 @@ router.delete('/', passport.authenticate('jwt', { session: false }), async (req,
         responseBody.groupPostsDeleted = true;
         await groupWithUsers.destroy();
         responseBody.groupDeleted = true;
+        res.status(204).json(responseBody);
       }
     } else {
       // User has tried to remove himself from permanent solo ("Just Me") group
