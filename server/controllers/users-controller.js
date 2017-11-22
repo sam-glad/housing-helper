@@ -15,6 +15,7 @@ router.get('/search', passport.authenticate('jwt', { session: false }), controll
 
   let users;
   if (req.query.emailAddress) {
+    // TODO: Case insensitive
     users = await User.where('email_address', req.query.emailAddress).fetchAll();
   } else if (req.query.name) {
     const nameForQuery = req.query.name.toLowerCase();
@@ -35,7 +36,7 @@ router.delete('/', passport.authenticate('jwt', { session: false }), controllerH
     return res.status(401).json({ message: 'Unauthorized' });
   }
 
-  if (req.body.emailAddress === req.user.attributes.email_address && req.body.confirmDelete === true) {
+  if (req.body.emailAddress && req.body.emailAddress.toLowerCase() === req.user.attributes.email_address.toLowerCase() && req.body.confirmDelete === true) {
     await req.user.destroy();
     return res.status(204).json({ deleted: true });
   // TODO: This else makes me nervous - come back to it?

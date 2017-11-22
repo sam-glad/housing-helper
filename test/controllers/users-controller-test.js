@@ -161,7 +161,7 @@ describe('/api/users', () => {
         // THEN the response should have status code 400
         res.should.have.status(400);
       }
-    });// it should...
+    }); // it should...
 
     it("should return 400 when the request body is missing confirmDelete", async () => {
       // GIVEN a properly authenticated request with a body
@@ -182,7 +182,7 @@ describe('/api/users', () => {
         // THEN the response should have status code 400
         res.should.have.status(400);
       }
-    });// it should...
+    }); // it should...
 
     it("should return 400 when the request body is missing the email address", async () => {
       // GIVEN a properly authenticated request with a body
@@ -203,7 +203,7 @@ describe('/api/users', () => {
         // THEN the response should have status code 400
         res.should.have.status(400);
       }
-    });// it should...
+    }); // it should...
 
     it("should return 400 when the request has no body", async () => {
       // GIVEN a properly authenticated request with a body
@@ -220,7 +220,7 @@ describe('/api/users', () => {
         // THEN the response should have status code 400
         res.should.have.status(400);
       }
-    });// it should...
+    }); // it should...
 
     it("should return 204 when the request has a valid body (emailAddress set to user's email address and confirmDelete: true)", async () => {
       // GIVEN a properly authenticated request
@@ -228,6 +228,25 @@ describe('/api/users', () => {
       const setup = await fullSetup();
       const body = {
         emailAddress: setup.user.attributes.email_address,
+        confirmDelete: true
+      };
+
+      // WHEN the request is made...
+      const res = await chai.request(server)
+        .delete('/api/users/')
+        .set('Authorization', `Bearer ${setup.token}`)
+        .send(body);
+
+      // THEN the response should indicate success with status code 204
+      res.should.have.status(204);
+    }); // it should...
+
+    it("should return 204 when the request has a valid body and the value of emailAddress is not all lower-case", async () => {
+      // GIVEN a properly authenticated request with an all-upper-case email address
+      // with a legitimate body
+      const setup = await fullSetup();
+      const body = {
+        emailAddress: setup.user.attributes.email_address.toUpperCase(),
         confirmDelete: true
       };
 
