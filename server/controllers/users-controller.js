@@ -5,7 +5,6 @@ const router = express.Router();
 const passport = require('passport');
 const controllerHelper = require('./controller-helper');
 const knex = require('../../db/knex');
-const Bookshelf = require('../../db/bookshelf');
 
 const User = require('../models/user');
 
@@ -29,6 +28,20 @@ router.get('/search', passport.authenticate('jwt', { session: false }), controll
     }).fetchAll();
   }
   res.json(users);
+}));
+
+router.delete('/', passport.authenticate('jwt', { session: false }), controllerHelper.wrapAsync(async function(req, res) {
+  if (!req.user) {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
+
+  if (req.body.emailAddress === req.user.attributes.email_address && req.body.confirmDelete === true) {
+    await req.user.destroy();
+    return res.status(204).json({ deleted: true });
+  // TODO: This else makes me nervous - come back to it?
+  } else {
+    return res.status(400).json( { message: 'Ensure that the value of email_address is your email address and that the value of confirmDelete is true' } )
+  }
 }));
 
 module.exports = router;

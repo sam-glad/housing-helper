@@ -11,6 +11,7 @@ const should = chai.should();
 const User = require('../../server/models/user');
 
 const userHelper = require('../helpers/user-helper');
+const groupHelper = require('../helpers/group-helper');
 
 chai.use(chaiHttp);
 
@@ -18,9 +19,10 @@ describe('/api/users', () => {
 
   beforeEach(async () => {
     await userHelper.deleteAllUsers();
+    await groupHelper.deleteAllGroups();
   });
 
-  describe('/api/users/search', () => {
+  describe('GET /api/users/search', () => {
     it('should return 401 when no user is authenticated', async () => {
       try {
         // GIVEN a request with no token...
@@ -101,6 +103,155 @@ describe('/api/users', () => {
       response.body[0].should.not.have.all.keys('password', 'email_address', 'created_at');
     }); // it should...
 
-  }); // describe '/api/users/search'
-}); // describe '/api/users'
+  }); // describe GET /api/users/search
+
+  describe('DELETE /api/users/', () => {
+    it('should return 401 with no user authenticated', async () => {
+      try {
+        // GIVEN a request with no token...
+        // WHEN that request is made...
+        const nonExistentRes = await chai.request(server)
+          .delete('/api/users/');
+        should.not.exist(nonExistentRes);
+      }
+      catch(res) {
+        // THEN the response should have status code 401
+        res.should.have.status(401);
+      }
+    }); // it should...
+
+    it("should return 400 when the email address in the request body does not match the authenticated user's", async () => {
+      // GIVEN a properly authenticated request with a body
+      // whose value for email_address is not the authenticated user's email address...
+      const setup = await fullSetup();
+      const body = {
+        emailAddress: "not the user's email address",
+        confirmDelete: true
+      };
+
+      try {
+        // WHEN the request is made...
+        const nonExistentRes = await chai.request(server)
+          .delete('/api/users/')
+          .set('Authorization', `Bearer ${setup.token}`);
+        should.not.exist(nonExistentRes);
+      } catch(res) {
+        // THEN the response should have status code 400
+        res.should.have.status(400);
+      }
+    }); // it should...
+
+    it("should return 400 when the request body's value for confirmDelete is not true", async () => {
+      // GIVEN a properly authenticated request with a body
+      // whose value for confirmDelete is not true...
+      const setup = await fullSetup();
+      const body = {
+        emailAddress: setup.user.attributes.email_address,
+        confirmDelete: 'true'
+      };
+
+      try {
+        // WHEN the request is made...
+        const nonExistentRes = await chai.request(server)
+          .delete('/api/users/')
+          .set('Authorization', `Bearer ${setup.token}`)
+          .send(body);
+        should.not.exist(nonExistentRes);
+      } catch(res) {
+        // THEN the response should have status code 400
+        res.should.have.status(400);
+      }
+    });// it should...
+
+    it("should return 400 when the request body is missing confirmDelete", async () => {
+      // GIVEN a properly authenticated request with a body
+      // which is missing confirmDelete...
+      const setup = await fullSetup();
+      const body = {
+        emailAddress: setup.user.attributes.email_address
+      };
+
+      try {
+        // WHEN the request is made...
+        const nonExistentRes = await chai.request(server)
+          .delete('/api/users/')
+          .set('Authorization', `Bearer ${setup.token}`)
+          .send(body);
+        should.not.exist(nonExistentRes);
+      } catch(res) {
+        // THEN the response should have status code 400
+        res.should.have.status(400);
+      }
+    });// it should...
+
+    it("should return 400 when the request body is missing the email address", async () => {
+      // GIVEN a properly authenticated request with a body
+      // which is missing the email address...
+      const setup = await fullSetup();
+      const body = {
+        confirmDelete: true
+      };
+
+      try {
+        // WHEN the request is made...
+        const nonExistentRes = await chai.request(server)
+          .delete('/api/users/')
+          .set('Authorization', `Bearer ${setup.token}`)
+          .send(body);
+        should.not.exist(nonExistentRes);
+      } catch(res) {
+        // THEN the response should have status code 400
+        res.should.have.status(400);
+      }
+    });// it should...
+
+    it("should return 400 when the request has no body", async () => {
+      // GIVEN a properly authenticated request with a body
+      // which is missing confirmDelete...
+      const setup = await fullSetup();
+
+      try {
+        // WHEN the request is made...
+        const nonExistentRes = await chai.request(server)
+          .delete('/api/users/')
+          .set('Authorization', `Bearer ${setup.token}`);
+        should.not.exist(nonExistentRes);
+      } catch(res) {
+        // THEN the response should have status code 400
+        res.should.have.status(400);
+      }
+    });// it should...
+
+    it("should return 204 when the request has a valid body (emailAddress set to user's email address and confirmDelete: true)", async () => {
+      // GIVEN a properly authenticated request
+      // with a legitimate body
+      const setup = await fullSetup();
+      const body = {
+        emailAddress: setup.user.attributes.email_address,
+        confirmDelete: true
+      };
+
+      // WHEN the request is made...
+      const res = await chai.request(server)
+        .delete('/api/users/')
+        .set('Authorization', `Bearer ${setup.token}`)
+        .send(body);
+
+      // THEN the response should indicate success with status code 204
+      res.should.have.status(204);
+    });// it should...
+
+  }); // describe /api/users/search
+}); // describe /api/users
+
+async function fullSetup() {
+  const userToSave = userHelper.buildUser();
+  const user = await User.forge(userToSave).save();
+  const token = await userHelper.getTokenForUser(user, userToSave.password);
+
+  return {
+    user: user,
+    token: token
+  };
+}
 
