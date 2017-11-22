@@ -40,6 +40,46 @@ curl -X POST \
 * Credentials provided must be for a registered user (see above)
 * Returns a token which must be used to authenticate most requests as the value for the *Authorization* header
 
+### Users
+
+**Search by name**
+
+```
+curl -X GET \
+  https://housinghelper.herokuapp.com/api/users/search?emailAddress=<EMAIL-ADDRESS-HERE> \
+  -H 'authorization: Bearer <YOUR-TOKEN-HERE>' 
+```
+
+OR
+
+```
+curl -X GET \
+  https://housinghelper.herokuapp.com/api/users/search?name=<NAME-HERE> \
+  -H 'authorization: Bearer <YOUR-TOKEN-HERE>' 
+```
+
+* Returns 401 if a user is not authenticated via token
+* Returns 400 if neither *emailAddress* nor *name* is provided as a query parameter
+* Returns 200 with the user with the email address provided by the *emailAddress* query param as an array, OR...
+* Returns 200 with the users whose names are similar to that provided by the *name* query param as an array
+
+**Delete oneself**
+
+```
+curl -X DELETE \
+  https://housinghelper.herokuapp.com/api/users \
+  -H 'authorization: Bearer <YOUR-TOKEN-HERE>' \
+  -d '{
+  "emailAddress": <YOUR-EMAIL-ADDRESS-HERE>,
+  "confirmDelete": true
+}'
+```
+
+* Returns 401 when no user is authenticated
+* Returns 400 when the value of emailAddress is not your email address or if emailAddress is missing
+* Returns 400 when the value of confirmDelete is not true (specifically as a boolean value) or if confirmDelete is missing
+* Returns 204 when the value of emailAddress is your email address and when the value of confirmDelete is true, indicating that you have deleted your account *permanently*
+
 ### Groups
 
 **Create**
