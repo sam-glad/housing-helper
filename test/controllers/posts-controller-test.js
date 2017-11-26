@@ -23,6 +23,7 @@ describe('/api/posts/', () => {
 
   beforeEach(async () => {
     await userHelper.deleteAllUsers();
+    await groupHelper.deleteAllGroups();
   });
 
   describe('GET /api/posts/', () => {
