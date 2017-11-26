@@ -10,6 +10,9 @@ const Group = require('../models/group');
 const Post = require('../models/post');
 
 router.post('/', passport.authenticate('jwt', { session: false }), controllerHelper.wrapAsync(async function(req, res) {
+  const isRequestValid = validatePostInput(req.body.group_id, req.body.users);
+  if (!isRequestValid) { return res.status(400).send() };
+
   const group = new Group();
   const groupWithUsers = await group.retrieveWithUsers(req.body.group_id);
 
@@ -22,7 +25,7 @@ router.post('/', passport.authenticate('jwt', { session: false }), controllerHel
   await groupWithUsers.users().attach(userIds);
   // TODO: Don't make the same goddamned query
   // Figure out how to return JSON of the updated group with users
-  return res.json(await group.retrieveWithUsers(req.body.group_id));
+  return res.status(201).json(await group.retrieveWithUsers(req.body.group_id));
 }));
 
 router.delete('/', passport.authenticate('jwt', { session: false }), controllerHelper.wrapAsync(async function(req, res) {
@@ -55,5 +58,32 @@ router.delete('/', passport.authenticate('jwt', { session: false }), controllerH
   // FIXME
   return res.status(204).json(responseBody);
 }));
+
+// TODO: unit tests for this
+function validatePostInput(groupId, users) {
+  if (!groupId || typeof groupId !== 'number') {
+    return false
+  }
+
+  if (!users || !users.length || users.length === 0) {
+    return false;
+  }
+
+  for(let i = 0; i < users.length; i++) {
+    if (!users[i].id || typeof users[i].id !== 'number') {
+      return false;
+    }
+
+    return true;
+  }
+
+  // return users.forEach((user) => {
+  //   if (!user.id || typeof user.id !== 'number') {
+  //     return false;
+  //   }
+
+  //   return true;
+  // });
+}
 
 module.exports = router;

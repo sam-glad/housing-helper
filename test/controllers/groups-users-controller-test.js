@@ -17,7 +17,7 @@ const bookshelf = require('../../db/bookshelf');
 chai.use(chaiHttp);
 
 describe('/api/groups-users/', () => {
-  const urlBase = '/api/groups-users/';
+  const urlBase = '/api/groups-users';
 
   beforeEach(async () => {
     await userHelper.deleteAllUsers();
@@ -26,7 +26,8 @@ describe('/api/groups-users/', () => {
 
   describe('POST /api/groups-users/', () => {
     it('should return 401 when no user is authenticated', async () => {
-      const setup = await testSetup();
+      const attachFirstUserToFirstGroup = false;
+      const setup = await testSetup(attachFirstUserToFirstGroup);
 
       try {
         // GIVEN a request with a valid payload and no token...
@@ -43,7 +44,8 @@ describe('/api/groups-users/', () => {
     }); // it should...
 
     it('should return 401 when an authenticated user attempts to insert a group-user for a group to which he does not belong', async () => {
-      const setup = await testSetup();
+      const attachFirstUserToFirstGroup = false;
+      const setup = await testSetup(attachFirstUserToFirstGroup);
 
       try {
         // GIVEN an otherwise valid request with a token
@@ -51,7 +53,7 @@ describe('/api/groups-users/', () => {
         // WHEN the request is made...
         const res = await chai.request(server)
           .post(`${urlBase}/`)
-          .set('Authorization', `Bearer: ${setup.firstUserToken}`)
+          .set('Authorization', `Bearer ${setup.firstUserToken}`)
           .send(setup.validPayload);
         should.not.exist(res);
       }
@@ -59,11 +61,47 @@ describe('/api/groups-users/', () => {
         // THEN the response should have status code 401
         res.should.have.status(401);
       }
-    });
+    }); // it should...
+
+    it('should return 400 when the request body is invalid', async () => {
+      const attachFirstUserToFirstGroup = false;
+      const setup = await testSetup(attachFirstUserToFirstGroup);
+      const badPayload = {};
+
+      try {
+        // GIVEN a request with a valid token but invalid payload...
+        // WHEN the request is made...
+        const res = await chai.request(server)
+          .post(`${urlBase}/`)
+          .set('Authorization', `Bearer ${setup.firstUserToken}`)
+          .send(badPayload);
+        should.not.exist(res);
+      }
+      catch(res) {
+        // THEN the response should have status code 401
+        res.should.have.status(400);
+      }
+    }); // it should
+
+    it('should return 201 for a valid request', async () => {
+      const attachFirstUserToFirstGroup = true;
+      const setup = await testSetup(attachFirstUserToFirstGroup);
+
+      // GIVEN a request with a valid token and valid payload...
+      // WHEN the request is made...
+      const res = await chai.request(server)
+        .post(`${urlBase}/`)
+        .set('Authorization', `Bearer ${setup.firstUserToken}`)
+        .send(setup.validPayload);
+      // THEN it should insert a group-user
+      res.should.have.status(201);
+      res.body.id.should.eql(setup.firstGroup.id);
+      res.body.users.filter((user) => { return user.id === setup.secondUser.id }).should.exist;
+    }); // it should
   }); // describe POST /api/groups-users/
 }); // describe /api/groups-users/
 
-async function testSetup() {
+async function testSetup(attachFirstUserToFirstGroup) {
   const firstUserToSave = userHelper.buildUser(1);
   const secondUserToSave = userHelper.buildUser(2);
   const firstGroupToSave = { name: 'First Group' };
@@ -75,6 +113,9 @@ async function testSetup() {
     secondUser = await User.forge(secondUserToSave).save(null, { transacting: trx });
     firstGroup = await Group.forge(firstGroupToSave).save(null, { transacting: trx });
     secondGroup = await Group.forge(secondGroupToSave).save(null, { transacting: trx });
+    if (attachFirstUserToFirstGroup) {
+      await firstGroup.users().attach(firstUser, { transacting: trx });
+    }
     firstUserToken = await userHelper.getTokenForUser(firstUser, firstUserToSave.password);
   });
 
@@ -84,6 +125,7 @@ async function testSetup() {
       users: [{ id: secondUser.id }]
     },
     firstUser: firstUser,
+    secondUser: secondUser,
     firstGroup: firstGroup,
     secondGroup: secondGroup,
     firstUserToken: firstUserToken
