@@ -76,14 +76,6 @@ function validatePostInput(groupId, users) {
 
     return true;
   }
-
-  // return users.forEach((user) => {
-  //   if (!user.id || typeof user.id !== 'number') {
-  //     return false;
-  //   }
-
-  //   return true;
-  // });
 }
 
 module.exports = router;
