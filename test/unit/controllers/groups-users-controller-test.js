@@ -9,58 +9,70 @@ const should = chai.should();
 
 describe('Groups-users controller helper', () => {
   const validGroupId = 1;
-  const validUsers = [{ id: 2 }];
+  const validUsers = [{ id: 1 }, { id: 2 }];
 
-  describe('With bad group ID input', () => {
-    let invalidGroupId;
-
+  describe('validateGroupIdForPostInput', () => {
     it('should return false with no group_id', () => {
-      groupsUsersControllerHelper.validatePostInput(invalidGroupId, validUsers).should.eql(false);
-    }); // it should....
+      groupsUsersControllerHelper.validateGroupIdForPostInput().should.eql(false);
+    });
 
-    it('should return false with a non-integer group_id', () => {
-      invalidGroupId = "I'm a string";
-      groupsUsersControllerHelper.validatePostInput(invalidGroupId, validUsers).should.eql(false);
-    }); // it should....
-  }); // describe bad group ID input
+    it('should return false with a non-number group_id', () => {
+      const nonNumberInvalidGroupId = "I'm a string";
+      groupsUsersControllerHelper.validateGroupIdForPostInput(nonNumberInvalidGroupId).should.eql(false);
+    });
 
-  describe('With bad users input', () => {
-    let invalidUsers;
+    it('should return true with a number group ID', () => {
+      groupsUsersControllerHelper.validateGroupIdForPostInput(validGroupId).should.eql(true);
+    });
+  }); // describe validateGroupIdForPostInput
 
+  describe('validateUsersForPostInput', () => {
     it('should return false with no users', () => {
-      groupsUsersControllerHelper.validatePostInput(validGroupId, invalidUsers).should.eql(false);
+      groupsUsersControllerHelper.validateUsersForPostInput().should.eql(false);
     });
 
     it('should return false when users is not an array', () => {
-      invalidUsers = { id: 1 };
-      groupsUsersControllerHelper.validatePostInput(validGroupId, invalidUsers).should.eql(false);
+      const nonArrayInvalidUsers = { id: 1 };
+      groupsUsersControllerHelper.validateUsersForPostInput(nonArrayInvalidUsers).should.eql(false);
     });
 
     it('should return false when users has length 0', () => {
-      invalidUsers = [];
-      groupsUsersControllerHelper.validatePostInput(validGroupId, invalidUsers).should.eql(false);
+      const lengthZeroInvalidUsers = [];
+      groupsUsersControllerHelper.validateUsersForPostInput(lengthZeroInvalidUsers).should.eql(false);
     });
 
     it("should return false when a user's ID is not a number", () => {
-      invalidUsers = { id: "I'm a string!" };
-      groupsUsersControllerHelper.validatePostInput(validGroupId, invalidUsers).should.eql(false);
+      const nonNumberInvalidUsers = { id: "I'm a string!" };
+      groupsUsersControllerHelper.validateUsersForPostInput(nonNumberInvalidUsers).should.eql(false);
     });
 
     it('should return false when one user is valid and one is not', () => {
-      invalidUsers = [{ id: 1 }, 2];
-      groupsUsersControllerHelper.validatePostInput(validGroupId, invalidUsers).should.eql(false);
+      const oneValidOneInvalidUsers = [{ id: 1 }, 2];
+      groupsUsersControllerHelper.validateUsersForPostInput(oneValidOneInvalidUsers).should.eql(false);
     });
 
     it('should return false when no user is valid', () => {
-      invalidUsers = [1, 2];
-      groupsUsersControllerHelper.validatePostInput(validGroupId, invalidUsers).should.eql(false);
+      const allInvalidUsers = [1, 2];
+      groupsUsersControllerHelper.validateUsersForPostInput(allInvalidUsers).should.eql(false);
     });
-  });
+
+    it('should return true when all users are valid', () => {
+      groupsUsersControllerHelper.validateUsersForPostInput(validUsers).should.eql(true);
+    });
+  }); // describe validateUsersForPostInput
 
   describe('With valid group_id and users input', () => {
-    it('should return true' , () => {
+    it('should return false with invalid group ID and valid users', () => {
+      groupsUsersControllerHelper.validatePostInput(validGroupId, {}).should.eql(false);
+    });
+
+    it('should return false with valid group ID and invalid users', () => {
+      groupsUsersControllerHelper.validatePostInput({}, validUsers).should.eql(false);
+    });
+
+    it('should return true with valid users and group ID' , () => {
       groupsUsersControllerHelper.validatePostInput(validGroupId, validUsers).should.eql(true);
     });
-  });
+  }); // describe validatePostInput
 
-}); // describe Groups-users controller unit tests
+}); // describe Groups-users controller helper
