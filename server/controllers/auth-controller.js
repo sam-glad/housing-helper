@@ -2,7 +2,7 @@
 
 const express = require('express');
 const router = express.Router();
-const controllerHelper = require('./controller-helper');
+const controllerHelper = require('./helpers/controller-helper');
 const jwt = require('jwt-simple');
 const authConfig = require('../config/auth-config');
 const User = require('../models/user');

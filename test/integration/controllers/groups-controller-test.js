@@ -2,20 +2,20 @@
 
 process.env.NODE_ENV = 'test';
 
-const bookshelf = require('../../db/bookshelf');
+const bookshelf = require('../../../db/bookshelf');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
-const server = require('../../app.js');
+const server = require('../../../app.js');
 const should = chai.should();
 
-const User = require('../../server/models/user');
-const Group = require('../../server/models/group');
+const User = require('../../../server/models/user');
+const Group = require('../../../server/models/group');
 
-const Post = require('../../server/models/post');
+const Post = require('../../../server/models/post');
 
-const userHelper = require('../helpers/user-helper');
-const groupHelper = require('../helpers/group-helper');
-const postHelper = require('../helpers/post-helper');
+const userHelper = require('../../helpers/user-helper');
+const groupHelper = require('../../helpers/group-helper');
+const postHelper = require('../../helpers/post-helper');
 
 chai.use(chaiHttp);
 

@@ -4,15 +4,15 @@ process.env.NODE_ENV = 'test';
 
 const chai = require('chai');
 const chaiHttp = require('chai-http');
-const server = require('../../app.js');
+const server = require('../../../app.js');
 const should = chai.should();
 
-const User = require('../../server/models/user');
-const Group = require('../../server/models/group');
+const User = require('../../../server/models/user');
+const Group = require('../../../server/models/group');
 
-const userHelper = require('../helpers/user-helper');
-const groupHelper = require('../helpers/group-helper');
-const bookshelf = require('../../db/bookshelf');
+const userHelper = require('../../helpers/user-helper');
+const groupHelper = require('../../helpers/group-helper');
+const bookshelf = require('../../../db/bookshelf');
 
 chai.use(chaiHttp);
 

@@ -4,13 +4,14 @@ const express = require('express');
 const router = express.Router();
 const passport = require('passport');
 
-const controllerHelper = require('./controller-helper');
+const controllerHelper = require('./helpers/controller-helper');
+const groupsUsersControllerHelper = require('./helpers/groups-users-controller-helper');
 const GroupUser = require('../models/group-user');
 const Group = require('../models/group');
 const Post = require('../models/post');
 
 router.post('/', passport.authenticate('jwt', { session: false }), controllerHelper.wrapAsync(async function(req, res) {
-  const isRequestValid = validatePostInput(req.body.group_id, req.body.users);
+  const isRequestValid = groupsUsersControllerHelper.validatePostInput(req.body.group_id, req.body.users);
   if (!isRequestValid) { return res.status(400).send() };
 
   const group = new Group();
@@ -58,24 +59,5 @@ router.delete('/', passport.authenticate('jwt', { session: false }), controllerH
   // FIXME
   return res.status(204).json(responseBody);
 }));
-
-// TODO: unit tests for this
-function validatePostInput(groupId, users) {
-  if (!groupId || typeof groupId !== 'number') {
-    return false
-  }
-
-  if (!users || !users.length || users.length === 0) {
-    return false;
-  }
-
-  for(let i = 0; i < users.length; i++) {
-    if (!users[i].id || typeof users[i].id !== 'number') {
-      return false;
-    }
-
-    return true;
-  }
-}
 
 module.exports = router;

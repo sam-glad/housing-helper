@@ -6,7 +6,7 @@
   "scripts": {
     "start:dev": "nodemon ./bin/www",
     "start": "node ./bin/www",
-    "test": "nyc mocha \"test/**/*.js\" --exit",
+    "test": "nyc mocha $(find test -name '*.js') --exit",
     "coverage": "nyc report --reporter=text-lcov | coveralls",
     "coveralls": "cat ./coverage/lcov.info | node node_modules/.bin/coveralls"
   },
