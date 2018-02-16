@@ -21,13 +21,14 @@ router.post('/login', controllerHelper.wrapAsync(async function(req, res) {
 }));
 
 router.post('/register', controllerHelper.wrapAsync(async function(req, res) {
+  console.log(`\r\nBODY: ${JSON.stringify(req.body)}\r\n`);
+
   const userFromRequest = { 
     email_address: req.body.email_address,
     name_first: req.body.name_first,
     name_last: req.body.name_last,
     password: req.body.password
   };
-
   // TODO: Model validation + middleware to handle this (stop being a meathead re: separation of concerns)
   Object.keys(userFromRequest).forEach((key) => {
     if (!userFromRequest[key]) {
