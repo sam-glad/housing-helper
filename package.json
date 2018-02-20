@@ -23,7 +23,7 @@
     "express": "^4.15.5",
     "istanbul": "^1.1.0-alpha.1",
     "jwt-simple": "^0.5.1",
-    "knex": "^0.13.0",
+    "knex": "^0.14.3",
     "morgan": "^1.8.2",
     "nyc": "^11.2.1",
     "passport": "^0.4.0",
