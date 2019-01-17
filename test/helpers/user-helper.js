@@ -43,7 +43,7 @@ async function insertTwoUsers(firstUserToSave, secondUserToSave) {
 }
 
 async function deleteAllUsers() {
-  await User.where('id', '!=', '0').destroy();
+  await User.where('id', '!=', '0').destroy({ require: false });
 };
 
 // Oh god
