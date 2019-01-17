@@ -32,7 +32,7 @@ async function buildGroups(numGroups, sequencesOfGroupToAttach) {
 }
 
 async function deleteAllGroups() {
-  await Group.where('id', '!=', '0').destroy();
+  await Group.where('id', '!=', '0').destroy({ require: false });
 };
 
 module.exports = {
