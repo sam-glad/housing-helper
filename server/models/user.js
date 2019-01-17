@@ -1,7 +1,7 @@
 'use strict';
 
 const bookshelf = require('../../db/bookshelf');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const jwt = require('jwt-simple');
 
 const authConfig = require('../config/auth-config');
