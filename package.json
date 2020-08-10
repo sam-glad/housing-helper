@@ -25,14 +25,14 @@
     "express": "^4.16.4",
     "istanbul": "^1.1.0-alpha.1",
     "jwt-simple": "^0.5.1",
-    "knex": "^0.16.3",
+    "knex": "^0.21.1",
     "morgan": "^1.9.1",
-    "nyc": "^13.0.1",
+    "nyc": "^15.0.0"
     "passport": "^0.4.0",
     "passport-jwt": "^4.0.0",
-    "pg": "^7.3.0",
+    "pg": "^8.0.3",
     "pg-hstore": "^2.3.2",
-    "snyk": "^1.316.1"
+    "snyk": "^1.189.0"
   },
   "devDependencies": {
     "chai": "^4.2.0",
