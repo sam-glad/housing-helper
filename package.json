@@ -19,7 +19,7 @@
     "bcrypt": ">=2.0.0",
     "bluebird": "^3.5.1",
     "body-parser": "^1.18.2",
-    "bookshelf": "^0.14.2",
+    "bookshelf": "^0.15.2",
     "bookshelf-cls-transaction": "^0.1.2",
     "dotenv": "^4.0.0",
     "express": "^4.16.4",
